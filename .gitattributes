@@ -1,0 +1,16 @@
+# Satır sonlarını normalize et — Windows/Mac arası tutarlılık
+* text=auto eol=lf
+
+# mvnw script'i her zaman LF olmalı (Mac/Linux'ta çalışması için)
+mvnw text eol=lf
+*.sh text eol=lf
+
+# Windows batch dosyaları CRLF
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# İkili dosyalar
+*.png binary
+*.jpg binary
+*.ico binary
+*.jar binary

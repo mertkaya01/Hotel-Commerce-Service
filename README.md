@@ -46,9 +46,15 @@ Gerçek bir otel veri seti (1M+ satır) üzerine kurulu, **tam yığın (full-st
 
 ## 🚀 Çalıştırma
 
+> Not: Ham veri seti (2.4 GB) repoda **yoktur**; uygulama repoya dahil olan
+> `backend/src/main/resources/data/hotels_subset.csv` (~5000 otel) ile kutudan çıktığı
+> gibi çalışır. Ekstra indirme gerekmez.
+
 ### Seçenek 1 — Docker (tek komut, önerilen)
 
 ```bash
+git clone <REPO_URL>
+cd STAJ
 docker compose up --build
 ```
 
@@ -76,6 +82,32 @@ cd frontend
 npm install
 npm start                      # http://localhost:4200
 ```
+
+### 🍎 macOS (Apple Silicon / M1–M2) kurulumu
+
+Tüm imajlar (Solr, Temurin JDK, Node, Nginx) arm64 destekler; Docker yolu M2'de sorunsuz çalışır.
+
+```bash
+# Gereksinimler (Homebrew ile)
+brew install --cask docker        # Docker Desktop (bir kez aç, arka planda çalışsın)
+brew install openjdk@21 node      # yalnızca yerel geliştirme için
+
+# Projeyi al ve tek komutla çalıştır
+git clone <REPO_URL>
+cd STAJ
+docker compose up --build         # http://localhost:4200
+```
+
+Yerel geliştirmede JDK 21'i PATH'e almak için (Apple Silicon):
+```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+```
+
+### 👤 Hazır hesaplar
+
+- **Platform yöneticisi** (ev sahibi başvurularını değerlendirir):
+  `admin@otel.com` / `admin1234` — uygulama açılışında otomatik oluşturulur.
+- Normal kullanıcı için **Kayıt Ol** ile hesap açabilirsin.
 
 ---
 
