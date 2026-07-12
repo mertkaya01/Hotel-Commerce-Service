@@ -1,0 +1,227 @@
+// Angular Material teması (datepicker, tabs, accordion, snackbar için gerekli)
+@use '@angular/material' as mat;
+@use 'tokens' as *;
+@use 'mixins' as *;
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Inter,
+      density: 0,
+    )
+  );
+}
+
+body {
+  color-scheme: light;
+  background-color: var(--app-bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  margin: 0;
+  min-height: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--text-strong);
+  font-weight: 700;
+}
+
+// ---- Yardimci sinif ve bilesenler (tekrari azaltir) ----
+.container {
+  @include container;
+}
+
+.section {
+  padding-block: 56px;
+
+  @include mobile {
+    padding-block: 36px;
+  }
+}
+
+.section-title {
+  font-size: 1.7rem;
+  font-weight: 800;
+  margin: 0 0 4px;
+  letter-spacing: -0.4px;
+}
+
+.section-subtitle {
+  color: var(--text-muted);
+  margin: 0 0 24px;
+}
+
+.btn-primary {
+  @include btn-primary;
+  padding: 12px 24px;
+  font-size: 1rem;
+}
+
+.btn-outline {
+  @include btn-outline;
+  padding: 10px 20px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+// ---- Animasyonlar ----
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.5s ease both;
+}
+
+.error-banner {
+  color: var(--danger);
+  font-size: 0.875rem;
+  margin: 0 0 8px;
+}
+
+// ---- Auth (Giriş / Kayıt) — split-screen premium ----
+.auth-page {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: calc(100vh - 72px);
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.auth-aside {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 56px;
+  color: #fff;
+  overflow: hidden;
+  background:
+    linear-gradient(150deg, rgba(0, 59, 149, 0.92), rgba(0, 108, 228, 0.82)),
+    url('https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200&q=80') center/cover;
+
+  @media (max-width: 900px) {
+    display: none;
+  }
+
+  .aside-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin-bottom: 24px;
+  }
+
+  h2 {
+    color: #fff;
+    font-size: 2.1rem;
+    line-height: 1.2;
+    margin: 0 0 16px;
+    max-width: 420px;
+  }
+
+  p {
+    font-size: 1.05rem;
+    opacity: 0.92;
+    max-width: 420px;
+    margin: 0 0 28px;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1rem;
+
+      mat-icon {
+        background: rgba(255, 255, 255, 0.18);
+        border-radius: 50%;
+        padding: 4px;
+      }
+    }
+  }
+}
+
+.auth-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  background: var(--app-bg);
+}
+
+.auth-box {
+  width: 100%;
+  max-width: 420px;
+
+  .auth-title {
+    font-size: 1.8rem;
+    margin: 0 0 4px;
+  }
+
+  .auth-sub {
+    color: var(--text-muted);
+    margin: 0 0 28px;
+  }
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-submit {
+  width: 100%;
+  padding: 14px;
+  margin-top: 8px;
+  font-size: 1.05rem;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 20px;
+  color: var(--text-muted);
+
+  a {
+    color: var(--brand-primary);
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

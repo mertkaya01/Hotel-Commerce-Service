@@ -1,0 +1,46 @@
+<div class="reservations-page">
+  <h1>Rezervasyonlarım</h1>
+
+  @if (loading()) {
+    <div class="center"><mat-spinner diameter="40"></mat-spinner></div>
+  } @else if (reservations().length === 0) {
+    <div class="empty">
+      <mat-icon>event_busy</mat-icon>
+      <p>Henüz bir rezervasyonun yok.</p>
+      <a mat-flat-button color="primary" routerLink="/">Otelleri keşfet</a>
+    </div>
+  } @else {
+    <div class="reservation-list">
+      @for (r of reservations(); track r.id) {
+        <mat-card appearance="outlined" [class.cancelled]="r.status === 'CANCELLED'">
+          <mat-card-content>
+            <div class="res-header">
+              <a class="hotel-name" [routerLink]="['/hotels', r.hotelCode]">{{ r.hotelName }}</a>
+              @if (r.status === 'CONFIRMED') {
+                <mat-chip class="status confirmed" highlighted>Onaylandı</mat-chip>
+              } @else {
+                <mat-chip class="status cancelled-chip">İptal Edildi</mat-chip>
+              }
+            </div>
+
+            <div class="res-details">
+              <span><mat-icon inline>hotel</mat-icon> Oda {{ r.roomNumber }} · {{ r.roomType }}</span>
+              <span>
+                <mat-icon inline>calendar_month</mat-icon>
+                {{ r.checkIn | date: 'd MMM yyyy' }} → {{ r.checkOut | date: 'd MMM yyyy' }}
+                ({{ r.nights }} gece)
+              </span>
+              <span class="price"><strong>{{ r.totalPrice | number: '1.0-0' }} ₺</strong></span>
+            </div>
+
+            @if (r.status === 'CONFIRMED') {
+              <div class="res-actions">
+                <button mat-stroked-button color="warn" (click)="cancel(r)">İptal Et</button>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

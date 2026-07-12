@@ -1,0 +1,29 @@
+# === Büyük ham veri seti (2.4GB) — GitHub'a YÜKLENMEZ ===
+# Uygulama, backend/src/main/resources/data/hotels_subset.csv (demo alt küme) ile çalışır.
+DataSet/
+Dataset/
+Exhibition/
+
+# === Backend (Java / Maven) ===
+backend/target/
+backend/data/
+backend/*.log
+
+# === Frontend (Angular / Node) ===
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/*.log
+
+# === Docker volume verisi ===
+# (adlandırılmış volume'ler Docker'da tutulur, repoya girmez)
+
+# === IDE / OS ===
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# === Genel ===
+*.log

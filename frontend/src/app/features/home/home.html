@@ -1,0 +1,185 @@
+<!-- ============ HERO + ARAMA KARTI ============ -->
+<section class="hero">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <h1>Hayalinizdeki Oteli Bul</h1>
+    <p>Binlerce otel arasında karşılaştırın ve en iyi fiyatlarla rezervasyon yapın.</p>
+
+    <div class="search-card">
+      <div class="field field--where">
+        <label><mat-icon inline>place</mat-icon> Nereye Gideceksiniz?</label>
+        <input
+          [formControl]="searchControl"
+          type="text"
+          placeholder="Şehir, otel veya bölge"
+          (keyup.enter)="onSearch()"
+        />
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field field--date">
+        <label><mat-icon inline>calendar_month</mat-icon> Giriş Tarihi</label>
+        <input type="date" [min]="todayStr" [formControl]="checkIn" />
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field field--date">
+        <label><mat-icon inline>calendar_month</mat-icon> Çıkış Tarihi</label>
+        <input type="date" [min]="todayStr" [formControl]="checkOut" />
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field field--guests">
+        <app-guest-selector />
+      </div>
+
+      <button class="search-btn" type="button" (click)="onSearch()">
+        <mat-icon>search</mat-icon>
+        <span>Ara</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ARAMA SONUÇLARI ============ -->
+@if (hasSearched()) {
+  <section class="section results-section">
+    <div class="container results-layout">
+      <aside class="facets">
+        <h3>Filtreler</h3>
+
+        @if (activeFilterEntries().length > 0) {
+          <mat-chip-set class="active-chips">
+            @for (entry of activeFilterEntries(); track entry.type) {
+              <mat-chip (removed)="removeFilter(entry.type)">
+                {{ entry.type === 'rating' ? ratingText(entry.value) : entry.value }}
+                <button matChipRemove aria-label="Kaldır"><mat-icon>cancel</mat-icon></button>
+              </mat-chip>
+            }
+          </mat-chip-set>
+        }
+
+        @for (group of facetKeys(); track group.key) {
+          @if (facets()[group.key]?.length) {
+            <div class="facet-group">
+              <h4>{{ group.label }}</h4>
+              <ul>
+                @for (fv of facets()[group.key]; track fv.value) {
+                  <li>
+                    <button class="facet-btn" (click)="applyFilter(group.type, fv.value)">
+                      <span>{{ group.type === 'rating' ? ratingText(fv.value) : fv.value }}</span>
+                      <span class="facet-count">{{ fv.count }}</span>
+                    </button>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+        }
+      </aside>
+
+      <div class="results">
+        <div class="results-header">
+          <span>{{ totalResults() }} sonuç bulundu</span>
+          @if (selectedDatesLabel) {
+            <span class="date-chip"><mat-icon inline>calendar_month</mat-icon> {{ selectedDatesLabel }}</span>
+          }
+        </div>
+
+        @if (loading()) {
+          <div class="center"><mat-spinner diameter="40"></mat-spinner></div>
+        } @else if (results().length === 0) {
+          <div class="empty">
+            <mat-icon>search_off</mat-icon>
+            <h3>Böyle bir otel bulunamadı</h3>
+            <p>Aramanıza uygun sonuç yok. Farklı bir şehir veya otel adı deneyin.</p>
+          </div>
+        } @else {
+          <div class="hotel-grid">
+            @for (hotel of results(); track hotel.hotelCode) {
+              <app-hotel-card [hotel]="hotel" />
+            }
+          </div>
+
+          @if (totalPages > 1) {
+            <div class="pagination">
+              <button class="btn-outline" [disabled]="page() === 0" (click)="goToPage(page() - 1)">
+                Önceki
+              </button>
+              <span>Sayfa {{ page() + 1 }} / {{ totalPages }}</span>
+              <button
+                class="btn-outline"
+                [disabled]="page() + 1 >= totalPages"
+                (click)="goToPage(page() + 1)"
+              >
+                Sonraki
+              </button>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </section>
+} @else {
+  <!-- ============ POPÜLER ŞEHİRLER ============ -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Popüler Şehirler</h2>
+      <p class="section-subtitle">En çok tercih edilen destinasyonları keşfet.</p>
+
+      <div class="city-grid">
+        @for (city of popularCities; track city.label) {
+          <button class="city-card" (click)="searchCity(city)">
+            <img [src]="cityPhoto(city.photo)" [alt]="city.label" loading="lazy" />
+            <span class="city-overlay"></span>
+            <span class="city-name">{{ city.label }}</span>
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ÖNE ÇIKAN OTELLER ============ -->
+  <section class="section featured">
+    <div class="container">
+      <h2 class="section-title">Öne Çıkan Oteller</h2>
+      <p class="section-subtitle">Yüksek puanlı, misafirlerin en çok beğendiği oteller.</p>
+
+      @if (featured().length === 0) {
+        <div class="center"><mat-spinner diameter="40"></mat-spinner></div>
+      } @else {
+        <div class="hotel-grid">
+          @for (hotel of featured(); track hotel.hotelCode) {
+            <app-hotel-card [hotel]="hotel" />
+          }
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ============ NEDEN BİZİ SEÇMELİSİNİZ ============ -->
+  <section class="section why-section">
+    <div class="container">
+      <h2 class="section-title">Neden Bizi Seçmelisiniz?</h2>
+      <p class="section-subtitle">Rezervasyon deneyimini güvenli ve keyifli kılıyoruz.</p>
+
+      <div class="why-grid">
+        @for (f of whyUs; track f.title) {
+          <app-feature-card [icon]="f.icon" [title]="f.title" [text]="f.text" />
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SSS ============ -->
+  <section class="section faq-section">
+    <div class="container">
+      <h2 class="section-title">Sık Sorulan Sorular</h2>
+      <p class="section-subtitle">Aklına takılanların yanıtı burada.</p>
+      <app-faq />
+    </div>
+  </section>
+}

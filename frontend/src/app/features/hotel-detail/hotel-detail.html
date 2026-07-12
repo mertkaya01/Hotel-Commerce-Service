@@ -1,0 +1,225 @@
+@if (loading()) {
+  <div class="center"><mat-spinner diameter="48"></mat-spinner></div>
+} @else if (hotel(); as h) {
+  <div class="detail container">
+    <a routerLink="/" class="back-link"><mat-icon>arrow_back</mat-icon> Aramaya dön</a>
+
+    <!-- Galeri -->
+    <app-hotel-gallery [photos]="gallery()" [alt]="h.name" />
+
+    <!-- Başlık -->
+    <header class="detail-header">
+      <div class="title-block">
+        <h1>{{ h.name }}</h1>
+        <div class="meta">
+          <app-star-rating [rating]="h.rating" />
+          <span class="loc"><mat-icon inline>place</mat-icon> {{ h.address || (h.cityName + ', ' + h.countryName) }}</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="score-box">
+          <div class="score">{{ reviewScore() | number: '1.1-1' }}</div>
+          <div class="score-meta">
+            <strong>{{ reviewLabel() }}</strong>
+            <span>{{ reviewCount() | number }} değerlendirme</span>
+          </div>
+        </div>
+        <button
+          class="icon-btn"
+          [class.active]="favorites.isFavorite(hotelCode())"
+          (click)="toggleFavorite()"
+        >
+          <mat-icon>{{ favorites.isFavorite(hotelCode()) ? 'favorite' : 'favorite_border' }}</mat-icon>
+          <span>Favori</span>
+        </button>
+        <button class="icon-btn" (click)="share()">
+          <mat-icon>share</mat-icon>
+          <span>Paylaş</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- İçerik + Sticky rezervasyon -->
+    <div class="detail-body">
+      <div class="detail-main">
+        <mat-tab-group animationDuration="300ms" dynamicHeight>
+          <!-- Genel Bakış -->
+          <mat-tab label="Genel Bakış">
+            <div class="tab-pane overview-grid">
+              @for (o of overview(); track o.title) {
+                <div class="overview-card">
+                  <mat-icon>{{ o.icon }}</mat-icon>
+                  <h4>{{ o.title }}</h4>
+                  <ul>
+                    @for (line of o.lines; track line) {
+                      <li>{{ line }}</li>
+                    }
+                  </ul>
+                </div>
+              }
+            </div>
+          </mat-tab>
+
+          <!-- Odalar -->
+          <mat-tab label="Odalar">
+            <div class="tab-pane room-list">
+              @for (room of rooms(); track room.id) {
+                <div class="room-card" [class.selected]="selectedRoom()?.id === room.id">
+                  <div class="room-info">
+                    <h4>{{ room.roomType }}</h4>
+                    <p><mat-icon inline>person</mat-icon> {{ room.capacity }} kişilik · Oda {{ room.roomNumber }}</p>
+                  </div>
+                  <div class="room-price">
+                    <strong>{{ room.pricePerNight | number: '1.0-0' }} ₺</strong>
+                    <span>/ gece</span>
+                  </div>
+                  <button
+                    class="select-btn"
+                    (click)="selectRoom(room)"
+                    [class.selected]="selectedRoom()?.id === room.id"
+                  >
+                    {{ selectedRoom()?.id === room.id ? 'Seçildi ✓' : 'Seç' }}
+                  </button>
+                </div>
+              }
+            </div>
+          </mat-tab>
+
+          <!-- Olanaklar -->
+          <mat-tab label="Olanaklar">
+            <div class="tab-pane">
+              @if (amenityGroups().length > 0) {
+                @for (group of amenityGroups(); track group.category) {
+                  <div class="amenity-group">
+                    <h4 class="amenity-category">{{ group.category }}</h4>
+                    <div class="amenity-grid">
+                      @for (a of group.items; track a.label) {
+                        <div class="amenity-card">
+                          <span class="amenity-icon"><mat-icon>{{ a.icon }}</mat-icon></span>
+                          <span>{{ a.label }}</span>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              } @else {
+                <p class="muted">Bu otel için olanak bilgisi bulunmuyor.</p>
+              }
+            </div>
+          </mat-tab>
+
+          <!-- Konum -->
+          <mat-tab label="Konum">
+            <div class="tab-pane">
+              <p class="addr"><mat-icon inline>place</mat-icon> {{ h.address || (h.cityName + ', ' + h.countryName) }}</p>
+              @if (mapUrl(); as url) {
+                <div class="map-wrap">
+                  <iframe [src]="url" title="Harita" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+              } @else {
+                <p class="muted">Konum bilgisi mevcut değil.</p>
+              }
+
+              <h4 class="nearby-title">Yakındaki Yerler</h4>
+              <div class="nearby-grid">
+                @for (n of nearby; track n.label) {
+                  <div class="nearby-card">
+                    <mat-icon>{{ n.icon }}</mat-icon>
+                    <div>
+                      <strong>{{ n.label }}</strong>
+                      <span>{{ n.distance }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </mat-tab>
+
+          <!-- Yorumlar -->
+          <mat-tab label="Yorumlar">
+            <div class="tab-pane reviews-grid">
+              @for (r of reviews(); track r.name) {
+                <app-review-card [review]="r" />
+              }
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+
+      <!-- Sticky rezervasyon kutusu -->
+      <aside class="booking-box">
+        <div class="booking-inner">
+          <div class="booking-price">
+            @if (selectedRoom(); as room) {
+              <strong>{{ room.pricePerNight | number: '1.0-0' }} ₺</strong>
+              <span>/ gece · {{ room.roomType }}</span>
+            } @else {
+              <strong>Oda seçin</strong>
+              <span>Odalar sekmesinden bir oda seçin</span>
+            }
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Tarih aralığı</mat-label>
+            <mat-date-range-input [formGroup]="dateRange" [rangePicker]="picker" [min]="today">
+              <input matStartDate formControlName="checkIn" placeholder="Giriş" />
+              <input matEndDate formControlName="checkOut" placeholder="Çıkış" />
+            </mat-date-range-input>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker></mat-date-range-picker>
+          </mat-form-field>
+
+          @if (nights() > 0 && selectedRoom()) {
+            <div class="summary-row">
+              <span>{{ selectedRoom()!.pricePerNight | number: '1.0-0' }} ₺ × {{ nights() }} gece</span>
+              <span>{{ totalPrice() | number: '1.0-0' }} ₺</span>
+            </div>
+            <div class="summary-total">
+              <strong>Toplam</strong>
+              <strong>{{ totalPrice() | number: '1.0-0' }} ₺</strong>
+            </div>
+          }
+
+          <button class="book-btn" (click)="book()" [disabled]="booking()">
+            @if (booking()) {
+              <mat-spinner diameter="20"></mat-spinner>
+            } @else {
+              Rezervasyon Yap
+            }
+          </button>
+          <p class="secure-note"><mat-icon inline>lock</mat-icon> Güvenli rezervasyon</p>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Benzer Oteller -->
+    @if (similar().length > 0) {
+      <section class="section-block">
+        <h2 class="section-title">Benzer Oteller</h2>
+        <div class="similar-grid">
+          @for (s of similar(); track s.hotelCode) {
+            <app-hotel-card [hotel]="s" />
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Neden Biz -->
+    <section class="section-block">
+      <h2 class="section-title">Neden Bizi Seçmelisiniz?</h2>
+      <div class="why-grid">
+        @for (f of whyUs; track f.title) {
+          <app-feature-card [icon]="f.icon" [title]="f.title" [text]="f.text" />
+        }
+      </div>
+    </section>
+
+    <!-- SSS -->
+    <section class="section-block">
+      <h2 class="section-title">Sık Sorulan Sorular</h2>
+      <app-faq />
+    </section>
+  </div>
+} @else {
+  <p class="center">Otel bulunamadı.</p>
+}

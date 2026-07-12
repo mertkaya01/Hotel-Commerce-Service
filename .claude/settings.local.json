@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s --max-time 8 \"https://hub.docker.com/v2/repositories/library/solr/tags?page_size=30&ordering=last_updated\")",
+      "Bash(python3 -c ' *)",
+      "Bash(curl -s --max-time 8 \"https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-starter-parent/maven-metadata.xml\")",
+      "Bash(powershell -Command 'Get-Process | Where-Object {$_.ProcessName -like '\\\\''*java*'\\\\''} | Stop-Process -Force -ErrorAction SilentlyContinue')",
+      "Bash(curl -s -X POST http://localhost:8080/api/auth/register -H 'Content-Type: application/json' -d '{\"email\":\"gecersiz-email\",\"password\":\"123\",\"firstName\":\"\",\"lastName\":\"Test\"}')",
+      "Bash(python3 -m json.tool)",
+      "Bash(docker compose *)",
+      "Bash(curl -s \"http://localhost:8983/solr/admin/cores?action=STATUS&core=hotels\")",
+      "Bash(curl -s --max-time 8 \"https://search.maven.org/solrsearch/select?q=g:org.apache.commons+AND+a:commons-csv&rows=1&wt=json\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('commons-csv latest:', d['response']['docs'][0]['latestVersion']\\)\")",
+      "Bash(grep -q \"CSV import tamamlandi\\\\|ERROR\\\\|Exception\" /tmp/import.log)",
+      "Read(//tmp/**)",
+      "Bash(grep -q \"CSV import tamamlandi\\\\|ERROR\\\\|Exception\" /tmp/import2.log)",
+      "Bash(powershell -Command \"Stop-Process -Id 10436,37456 -Force -ErrorAction SilentlyContinue\")",
+      "Bash(powershell -Command 'Get-Process | Where-Object {$_.ProcessName -like '\\\\''*java*'\\\\''}')",
+      "Bash(curl -s \"http://localhost:8080/api/hotels/search?q=beach&size=3\")",
+      "Bash(curl -s \"http://localhost:8080/api/hotels/search?country=Turkey&size=3\")",
+      "Bash(rm \"C:\\\\Users\\\\MERT\\\\Desktop\\\\STAJ\\\\backend\\\\encoding_check.txt\")",
+      "Bash(rm -rf data)",
+      "Bash(curl -s \"http://localhost:8080/api/hotels/search?q=Buyuk&country=Turkey&size=5\" -o /tmp/search_result.json)",
+      "Bash(powershell -Command 'Get-Process | Where-Object {$_.ProcessName -like '\\\\''*java*'\\\\''} | Select-Object Id')",
+      "Bash(curl -sv \"http://localhost:8080/api/hotels/search?q=Buyuk&size=1\")",
+      "Bash(curl -s \"http://localhost:8080/api/hotels/1252699\")",
+      "Bash(curl -s \"http://localhost:8080/api/hotels/search?q=Abant&size=3\")",
+      "Bash(ng version *)",
+      "Bash(ng generate *)",
+      "Bash(npx ng *)",
+      "Bash(npm install *)"
+    ]
+  }
+}

@@ -1,0 +1,53 @@
+<header class="navbar">
+  <div class="navbar-inner">
+    <a routerLink="/" class="brand">
+      <mat-icon>hotel</mat-icon>
+      <span>Otel Rezervasyon</span>
+    </a>
+
+    <nav class="nav-links">
+      @if (authService.isLoggedIn()) {
+        @if (authService.isSuperAdmin()) {
+          <a routerLink="/host/applications" routerLinkActive="active" class="nav-link host-link">
+            <mat-icon>how_to_reg</mat-icon>
+            <span>Başvurular</span>
+          </a>
+        } @else if (authService.isHost()) {
+          <a routerLink="/host" routerLinkActive="active" class="nav-link host-link">
+            <mat-icon>verified</mat-icon>
+            <span>Ev Sahibi</span>
+          </a>
+        }
+        <a routerLink="/reservations" routerLinkActive="active" class="nav-link">
+          <mat-icon>event</mat-icon>
+          <span>Rezervasyonlarım</span>
+        </a>
+        <a routerLink="/favorites" routerLinkActive="active" class="nav-link">
+          <mat-icon>favorite</mat-icon>
+          <span>Favoriler</span>
+          @if (favorites.count() > 0) {
+            <span class="badge">{{ favorites.count() }}</span>
+          }
+        </a>
+        <a routerLink="/profile" routerLinkActive="active" class="nav-link">
+          <mat-icon>person</mat-icon>
+          <span>{{ authService.currentUser()?.firstName }}</span>
+        </a>
+        <button class="logout-btn" (click)="onLogout()">
+          <mat-icon>logout</mat-icon>
+          <span>Çıkış Yap</span>
+        </button>
+      } @else {
+        <a routerLink="/favorites" routerLinkActive="active" class="nav-link">
+          <mat-icon>favorite_border</mat-icon>
+          <span>Favoriler</span>
+          @if (favorites.count() > 0) {
+            <span class="badge">{{ favorites.count() }}</span>
+          }
+        </a>
+        <a routerLink="/login" class="nav-link">Giriş Yap</a>
+        <a routerLink="/register" class="nav-cta">Kayıt Ol</a>
+      }
+    </nav>
+  </div>
+</header>

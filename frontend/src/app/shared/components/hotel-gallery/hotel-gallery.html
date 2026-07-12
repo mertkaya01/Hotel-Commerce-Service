@@ -1,0 +1,12 @@
+<div class="gallery">
+  <div class="main">
+    <img [src]="mainPhoto()" [alt]="alt()" />
+  </div>
+  <div class="thumbs">
+    @for (photo of thumbs(); track photo; let i = $index) {
+      <button class="thumb" [class.active]="isActive(i)" (click)="select(i)">
+        <img [src]="photo" [alt]="alt() + ' ' + (i + 1)" loading="lazy" />
+      </button>
+    }
+  </div>
+</div>

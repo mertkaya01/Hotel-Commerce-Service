@@ -1,0 +1,378 @@
+@use 'mixins' as *;
+
+/* ============ HERO ============ */
+.hero {
+  position: relative;
+  min-height: 550px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px 90px;
+  background:
+    url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600&q=80') center/cover
+    no-repeat;
+
+  @include mobile {
+    min-height: 480px;
+  }
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 30, 68, 0.72) 0%, rgba(0, 30, 68, 0.55) 100%);
+}
+
+.hero-content {
+  position: relative;
+  width: 100%;
+  max-width: 1040px;
+  text-align: center;
+  color: #fff;
+
+  h1 {
+    color: #fff;
+    font-size: 2.9rem;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    margin: 0 0 10px;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+
+    @include mobile {
+      font-size: 2rem;
+    }
+  }
+
+  > p {
+    font-size: 1.15rem;
+    opacity: 0.95;
+    margin: 0 0 32px;
+
+    @include mobile {
+      font-size: 1rem;
+    }
+  }
+}
+
+/* ============ ARAMA KARTI ============ */
+.search-card {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 10px;
+  text-align: left;
+
+  @include tablet {
+    flex-direction: column;
+  }
+}
+
+.field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 12px 18px;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-muted);
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      color: var(--brand-primary);
+    }
+  }
+
+  input,
+  select {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--text-strong);
+    width: 100%;
+    padding: 4px 0;
+    color-scheme: light;
+
+    &::placeholder {
+      color: var(--text-muted);
+    }
+  }
+
+  select {
+    cursor: pointer;
+  }
+}
+
+.field--where {
+  flex: 1.6;
+}
+
+.guests-row {
+  display: flex;
+  gap: 8px;
+
+  select {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.divider {
+  width: 1px;
+  background: var(--border);
+  margin: 10px 0;
+
+  @include tablet {
+    width: auto;
+    height: 1px;
+    margin: 0 18px;
+  }
+}
+
+.search-btn {
+  @include btn-primary;
+  margin: 6px;
+  padding: 0 34px;
+  font-size: 1.05rem;
+  border-radius: var(--radius) !important;
+
+  mat-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+
+  @include tablet {
+    padding: 16px;
+  }
+}
+
+/* ============ ORTAK GRID ============ */
+.hotel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============ POPÜLER ŞEHİRLER ============ */
+.city-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 18px;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @include mobile {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+.city-card {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border: none;
+  padding: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  @include lift-on-hover(1.02);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  &:hover img {
+    transform: scale(1.1);
+  }
+
+  .city-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.6) 100%);
+  }
+
+  .city-name {
+    position: absolute;
+    left: 14px;
+    bottom: 12px;
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* ============ NEDEN BİZ ============ */
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.why-section {
+  background: var(--card-bg);
+  border-block: 1px solid var(--border);
+}
+
+/* ============ ARAMA SONUÇLARI ============ */
+.results-section {
+  padding-top: 32px;
+}
+
+.results-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 28px;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+.facets {
+  align-self: start;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+
+  h3 {
+    margin: 0 0 14px;
+    font-size: 1.1rem;
+  }
+
+  .facet-group {
+    margin-bottom: 18px;
+
+    h4 {
+      margin: 0 0 8px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+  }
+}
+
+.facet-btn {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 7px 10px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: var(--text);
+  transition: background var(--transition);
+
+  &:hover {
+    background: var(--brand-primary-050);
+    color: var(--brand-primary);
+  }
+}
+
+.facet-count {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.active-chips {
+  margin-bottom: 14px;
+}
+
+.results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+  font-weight: 600;
+
+  .date-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--brand-primary-050);
+    color: var(--brand-primary-dark);
+    padding: 4px 12px;
+    border-radius: var(--radius-pill);
+    font-size: 0.85rem;
+  }
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+  color: var(--text-muted);
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  padding: 48px;
+}
+
+.empty {
+  text-align: center;
+  padding: 60px 16px;
+  color: var(--text-muted);
+
+  mat-icon {
+    font-size: 56px;
+    width: 56px;
+    height: 56px;
+    margin-bottom: 12px;
+    opacity: 0.5;
+  }
+
+  h3 {
+    margin: 0 0 6px;
+  }
+
+  p {
+    margin: 0;
+  }
+}

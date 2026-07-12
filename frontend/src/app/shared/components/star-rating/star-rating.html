@@ -1,0 +1,9 @@
+@if (isUnrated()) {
+  <span class="unrated">Degerlendirilmemis</span>
+} @else {
+  <span class="stars" [attr.aria-label]="stars() + ' yildiz'">
+    @for (star of [1, 2, 3, 4, 5]; track star) {
+      <mat-icon>{{ star <= stars() ? 'star' : 'star_border' }}</mat-icon>
+    }
+  </span>
+}

@@ -1,0 +1,60 @@
+<div class="guest-selector">
+  <button type="button" class="trigger" (click)="toggle()">
+    <div class="trigger-text">
+      <span class="label"><mat-icon inline>group</mat-icon> Misafir & Oda</span>
+      <span class="value">{{ summary() }}</span>
+    </div>
+    <mat-icon class="chevron" [class.up]="open()">expand_more</mat-icon>
+  </button>
+
+  @if (open()) {
+    <div class="backdrop" (click)="close()"></div>
+    <div class="panel">
+      <div class="row">
+        <div class="row-label">
+          <strong>Yetişkin</strong>
+          <span>13 yaş ve üzeri</span>
+        </div>
+        <div class="stepper">
+          <button type="button" (click)="step('adults', -1)" [disabled]="adults() <= 1">−</button>
+          <span>{{ adults() }}</span>
+          <button type="button" (click)="step('adults', 1)">+</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="row-label">
+          <strong>Çocuk</strong>
+          <span>0 - 12 yaş</span>
+        </div>
+        <div class="stepper">
+          <button type="button" (click)="step('children', -1)" [disabled]="children() <= 0">−</button>
+          <span>{{ children() }}</span>
+          <button type="button" (click)="step('children', 1)">+</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="row-label">
+          <strong>Oda</strong>
+          <span>Oda sayısı</span>
+        </div>
+        <div class="stepper">
+          <button type="button" (click)="step('rooms', -1)" [disabled]="rooms() <= 1">−</button>
+          <span>{{ rooms() }}</span>
+          <button type="button" (click)="step('rooms', 1)">+</button>
+        </div>
+      </div>
+
+      <label class="pet-row">
+        <input type="checkbox" [checked]="pet()" (change)="togglePet()" />
+        <span class="check-visual"><mat-icon>check</mat-icon></span>
+        <span class="pet-text">
+          <mat-icon inline>pets</mat-icon> Evcil hayvanımla seyahat ediyorum
+        </span>
+      </label>
+
+      <button type="button" class="done-btn" (click)="close()">Tamam</button>
+    </div>
+  }
+</div>

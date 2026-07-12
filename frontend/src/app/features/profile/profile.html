@@ -1,0 +1,182 @@
+<div class="profile-page container">
+  @if (loading()) {
+    <div class="center"><mat-spinner diameter="40"></mat-spinner></div>
+  } @else {
+    <!-- Üst kart: özelleştirilebilir banner -->
+    <div class="profile-hero" [style.background]="banner.currentBackground()">
+      <div class="avatar">{{ initials() }}</div>
+      <div class="who">
+        <h1>{{ user()?.firstName }} {{ user()?.lastName }}</h1>
+        <p>{{ email() }}</p>
+        @if (isSuperAdmin()) {
+          <span class="role-badge super"><mat-icon inline>shield</mat-icon> Platform Yöneticisi</span>
+        } @else if (isHost()) {
+          <span class="role-badge host"><mat-icon inline>verified</mat-icon> Ev Sahibi</span>
+        } @else {
+          <span class="role-badge"><mat-icon inline>person</mat-icon> Üye</span>
+        }
+      </div>
+
+      <button class="customize-btn" (click)="toggleThemes()" title="Arka planı değiştir">
+        <mat-icon>palette</mat-icon>
+      </button>
+    </div>
+
+    <!-- Banner tema seçici -->
+    @if (showThemes()) {
+      <div class="theme-picker">
+        <span class="theme-label">Arka plan seç:</span>
+        @for (t of banner.themes; track t.id) {
+          <button
+            class="swatch"
+            [class.active]="banner.currentId() === t.id"
+            [style.background]="t.background"
+            [title]="t.label"
+            (click)="banner.select(t.id)"
+          >
+            @if (banner.currentId() === t.id) {
+              <mat-icon>check</mat-icon>
+            }
+          </button>
+        }
+      </div>
+    }
+
+    <!-- Hızlı erişim -->
+    <div class="quick-grid">
+      <a routerLink="/reservations" class="quick-card">
+        <mat-icon>event</mat-icon>
+        <div>
+          <strong>Rezervasyonlarım</strong>
+          <span>Geçmiş ve aktif rezervasyonlar</span>
+        </div>
+      </a>
+      <a routerLink="/favorites" class="quick-card">
+        <mat-icon>favorite</mat-icon>
+        <div>
+          <strong>Favorilerim</strong>
+          <span>{{ favorites.count() }} kayıtlı otel</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="profile-cols">
+      <!-- Hesap bilgileri + şifre -->
+      <div class="left-col">
+        <section class="panel">
+          <h2>Hesap Bilgileri</h2>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email</mat-label>
+            <input matInput [value]="email()" disabled />
+          </mat-form-field>
+
+          <form [formGroup]="form" (ngSubmit)="onSave()">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Ad</mat-label>
+              <input matInput formControlName="firstName" />
+              @if (form.controls.firstName.hasError('required') && form.controls.firstName.touched) {
+                <mat-error>Ad boş olamaz</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Soyad</mat-label>
+              <input matInput formControlName="lastName" />
+              @if (form.controls.lastName.hasError('required') && form.controls.lastName.touched) {
+                <mat-error>Soyad boş olamaz</mat-error>
+              }
+            </mat-form-field>
+
+            <button type="submit" class="btn-primary" [disabled]="saving()">
+              @if (saving()) {
+                <mat-spinner diameter="20"></mat-spinner>
+              } @else {
+                Değişiklikleri Kaydet
+              }
+            </button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <h2>Şifre Değiştir</h2>
+          <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Mevcut Şifre</mat-label>
+              <input matInput type="password" formControlName="currentPassword" autocomplete="current-password" />
+              @if (passwordForm.controls.currentPassword.hasError('required') && passwordForm.controls.currentPassword.touched) {
+                <mat-error>Mevcut şifre boş olamaz</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Yeni Şifre</mat-label>
+              <input matInput type="password" formControlName="newPassword" autocomplete="new-password" />
+              @if (passwordForm.controls.newPassword.hasError('required') && passwordForm.controls.newPassword.touched) {
+                <mat-error>Yeni şifre boş olamaz</mat-error>
+              }
+              @if (passwordForm.controls.newPassword.hasError('minlength') && passwordForm.controls.newPassword.touched) {
+                <mat-error>Şifre en az 8 karakter olmalı</mat-error>
+              }
+            </mat-form-field>
+
+            <button type="submit" class="btn-outline" [disabled]="changingPw()">
+              @if (changingPw()) {
+                <mat-spinner diameter="20"></mat-spinner>
+              } @else {
+                Şifreyi Güncelle
+              }
+            </button>
+          </form>
+        </section>
+      </div>
+
+      <!-- Ev sahibi / Yönetici bölümü -->
+      <section class="panel host-panel">
+        @if (isSuperAdmin()) {
+          <div class="host-state">
+            <div class="host-icon super"><mat-icon>shield</mat-icon></div>
+            <h2>Platform Yöneticisi</h2>
+            <p>Ev sahibi başvurularını değerlendirebilir, onaylayabilir veya reddedebilirsin.</p>
+            <a routerLink="/host/applications" class="btn-primary">Başvuruları Görüntüle</a>
+          </div>
+        } @else if (isHost()) {
+          <div class="host-state">
+            <div class="host-icon success"><mat-icon>verified</mat-icon></div>
+            <h2>Ev Sahibi Hesabı Aktif</h2>
+            <p>Otel yönetimi yetkisine sahipsin. Otellerini ve başvuruları yönetebilirsin.</p>
+            <a routerLink="/host" class="btn-primary">Ev Sahibi Paneli</a>
+          </div>
+        } @else if (application()?.status === 'PENDING') {
+          <div class="host-state">
+            <div class="host-icon pending"><mat-icon>hourglass_top</mat-icon></div>
+            <h2>Başvurun Değerlendiriliyor</h2>
+            <p>
+              Ev sahibi başvurun alındı ve inceleniyor. Onaylandığında ev sahibi rozetini
+              kazanacaksın.
+            </p>
+            <span class="status-chip pending">Beklemede</span>
+          </div>
+        } @else if (application()?.status === 'REJECTED') {
+          <div class="host-state">
+            <div class="host-icon rejected"><mat-icon>cancel</mat-icon></div>
+            <h2>Başvurun Onaylanmadı</h2>
+            <p>Bu sefer olmadı ama tekrar başvurabilirsin. Bilgilerini güncelleyip yeniden dene.</p>
+            <a routerLink="/become-host" class="btn-primary">Tekrar Başvur</a>
+          </div>
+        } @else {
+          <div class="host-state">
+            <div class="host-icon"><mat-icon>apartment</mat-icon></div>
+            <h2>Otelini Kaydettir</h2>
+            <p>Bir tesisin mi var? Ev sahibi başvurusu yap, değerlendirme sonrası otellerini listele.</p>
+            <ul class="host-perks">
+              <li><mat-icon inline>check_circle</mat-icon> Otellerini yönet</li>
+              <li><mat-icon inline>check_circle</mat-icon> Oda ve fiyat kontrolü</li>
+              <li><mat-icon inline>check_circle</mat-icon> Rezervasyon takibi</li>
+            </ul>
+            <a routerLink="/become-host" class="btn-primary full-width">Ev Sahibi Ol</a>
+          </div>
+        }
+      </section>
+    </div>
+  }
+</div>

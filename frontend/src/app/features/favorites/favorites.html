@@ -1,0 +1,21 @@
+<div class="favorites-page container">
+  <h1 class="section-title">Favorilerim</h1>
+  <p class="section-subtitle">Beğendiğin otelleri buradan takip et.</p>
+
+  @if (loading()) {
+    <div class="center"><mat-spinner diameter="40"></mat-spinner></div>
+  } @else if (hotels().length === 0) {
+    <div class="empty">
+      <mat-icon>favorite_border</mat-icon>
+      <h3>Henüz favori otelin yok</h3>
+      <p>Otelleri gezerken kalp simgesine dokunarak favorilerine ekleyebilirsin.</p>
+      <a routerLink="/" class="btn-primary">Otelleri Keşfet</a>
+    </div>
+  } @else {
+    <div class="hotel-grid">
+      @for (hotel of hotels(); track hotel.hotelCode) {
+        <app-hotel-card [hotel]="hotel" />
+      }
+    </div>
+  }
+</div>

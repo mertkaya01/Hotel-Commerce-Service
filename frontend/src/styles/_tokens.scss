@@ -1,0 +1,49 @@
+// ============================================================
+//  Tasarim Token'lari — tum uygulamada tek kaynak (renk, golge, radius)
+//  Bu degerler CSS degiskeni olarak :root'a yazilir; hem SCSS hem
+//  runtime'da kullanilabilir.
+// ============================================================
+
+:root {
+  // Marka renkleri
+  --brand-primary: #006ce4;
+  --brand-primary-dark: #003b95;
+  --brand-primary-050: #eaf3ff;
+  --brand-primary-100: #d3e6ff;
+
+  // Yuzeyler
+  --app-bg: #f6f8fb;
+  --card-bg: #ffffff;
+  --border: #e5e7eb;
+
+  // Durum renkleri
+  --success: #16a34a;
+  --warning: #f59e0b;
+  --danger: #dc2626;
+
+  // Metin
+  --text-strong: #0f172a;
+  --text: #334155;
+  --text-muted: #64748b;
+
+  // Sekil
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+
+  // Golge
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 20px 45px rgba(0, 0, 0, 0.16);
+
+  // Gecis
+  --transition: 0.3s ease;
+}
+
+// SCSS tarafinda da kullanmak icin sabitler (media query, hesap vb.)
+$bp-mobile: 640px;
+$bp-tablet: 900px;
+$bp-desktop: 1200px;
+
+$container: 1200px;

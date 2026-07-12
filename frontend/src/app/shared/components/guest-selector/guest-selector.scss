@@ -1,0 +1,209 @@
+@use 'mixins' as *;
+
+.guest-selector {
+  position: relative;
+  width: 100%;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+
+  .trigger-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-muted);
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      color: var(--brand-primary);
+    }
+  }
+
+  .value {
+    font-size: 1rem;
+    color: var(--text-strong);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chevron {
+    color: var(--text-muted);
+    transition: transform var(--transition);
+
+    &.up {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+}
+
+.panel {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 50;
+  width: 300px;
+  max-width: 88vw;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 16px;
+  animation: fadeInUp 0.18s ease both;
+
+  @include tablet {
+    left: 0;
+    right: auto;
+  }
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+
+  .row-label {
+    display: flex;
+    flex-direction: column;
+
+    strong {
+      color: var(--text-strong);
+      font-size: 0.95rem;
+    }
+    span {
+      color: var(--text-muted);
+      font-size: 0.78rem;
+    }
+  }
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  button {
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--brand-primary);
+    border-radius: 8px;
+    background: var(--card-bg);
+    color: var(--brand-primary);
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: all var(--transition);
+
+    &:hover:not(:disabled) {
+      background: var(--brand-primary);
+      color: #fff;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  span {
+    min-width: 18px;
+    text-align: center;
+    font-weight: 600;
+  }
+}
+
+.pet-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 0 6px;
+  cursor: pointer;
+  user-select: none;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .check-visual {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      color: #fff;
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+  }
+
+  input:checked + .check-visual {
+    background: var(--brand-primary);
+    border-color: var(--brand-primary);
+
+    mat-icon {
+      opacity: 1;
+    }
+  }
+
+  .pet-text {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+    color: var(--text);
+
+    mat-icon {
+      color: var(--brand-primary);
+    }
+  }
+}
+
+.done-btn {
+  @include btn-primary;
+  width: 100%;
+  padding: 10px;
+  margin-top: 12px;
+}

@@ -1,0 +1,69 @@
+<div class="apply-page container">
+  <a routerLink="/profile" class="back"><mat-icon inline>arrow_back</mat-icon> Profile dön</a>
+
+  <div class="apply-card">
+    <div class="apply-head">
+      <div class="icon"><mat-icon>apartment</mat-icon></div>
+      <div>
+        <h1>Ev Sahibi Başvurusu</h1>
+        <p>Seni tanıyalım. Başvurun ekibimizce değerlendirildikten sonra ev sahibi olacaksın.</p>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Ad</mat-label>
+          <input matInput formControlName="firstName" />
+          @if (form.controls.firstName.hasError('required') && form.controls.firstName.touched) {
+            <mat-error>Ad boş olamaz</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Soyad</mat-label>
+          <input matInput formControlName="lastName" />
+          @if (form.controls.lastName.hasError('required') && form.controls.lastName.touched) {
+            <mat-error>Soyad boş olamaz</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Doğum Tarihi</mat-label>
+        <input matInput type="date" formControlName="birthDate" [max]="todayStr" />
+        @if (form.controls.birthDate.hasError('required') && form.controls.birthDate.touched) {
+          <mat-error>Doğum tarihi boş olamaz</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Kendini ve tesisini anlat</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          rows="5"
+          placeholder="Örn. Kapadokya'da 12 odalı butik bir otelim var, misafirperverliğe önem veriyorum..."
+        ></textarea>
+        @if (form.controls.description.hasError('required') && form.controls.description.touched) {
+          <mat-error>Açıklama boş olamaz</mat-error>
+        }
+        @if (form.controls.description.hasError('minlength') && form.controls.description.touched) {
+          <mat-error>En az 20 karakter yaz</mat-error>
+        }
+      </mat-form-field>
+
+      @if (errorMessage()) {
+        <p class="error-banner">{{ errorMessage() }}</p>
+      }
+
+      <button type="submit" class="btn-primary full-width" [disabled]="submitting()">
+        @if (submitting()) {
+          <mat-spinner diameter="20"></mat-spinner>
+        } @else {
+          Başvuruyu Gönder
+        }
+      </button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,75 @@
+<div class="auth-page">
+  <aside class="auth-aside">
+    <div class="aside-brand"><mat-icon>hotel</mat-icon> Otel Rezervasyon</div>
+    <h2>Aramıza katıl!</h2>
+    <p>Ücretsiz hesap oluştur, dakikalar içinde rezervasyon yapmaya başla.</p>
+    <ul>
+      <li><mat-icon>check</mat-icon> Saniyeler içinde kayıt</li>
+      <li><mat-icon>check</mat-icon> Favori otellerini kaydet</li>
+      <li><mat-icon>check</mat-icon> Rezervasyonlarını tek yerden yönet</li>
+    </ul>
+  </aside>
+
+  <main class="auth-main">
+    <div class="auth-box">
+      <h1 class="auth-title">Kayıt Ol</h1>
+      <p class="auth-sub">Hemen ücretsiz bir hesap oluştur.</p>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Ad</mat-label>
+          <input matInput formControlName="firstName" autocomplete="given-name" />
+          @if (form.controls.firstName.hasError('required') && form.controls.firstName.touched) {
+            <mat-error>Ad boş olamaz</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Soyad</mat-label>
+          <input matInput formControlName="lastName" autocomplete="family-name" />
+          @if (form.controls.lastName.hasError('required') && form.controls.lastName.touched) {
+            <mat-error>Soyad boş olamaz</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" autocomplete="email" />
+          @if (form.controls.email.hasError('required') && form.controls.email.touched) {
+            <mat-error>Email boş olamaz</mat-error>
+          }
+          @if (form.controls.email.hasError('email') && form.controls.email.touched) {
+            <mat-error>Geçerli bir email giriniz</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Şifre</mat-label>
+          <input matInput type="password" formControlName="password" autocomplete="new-password" />
+          @if (form.controls.password.hasError('required') && form.controls.password.touched) {
+            <mat-error>Şifre boş olamaz</mat-error>
+          }
+          @if (form.controls.password.hasError('minlength') && form.controls.password.touched) {
+            <mat-error>Şifre en az 8 karakter olmalı</mat-error>
+          }
+        </mat-form-field>
+
+        @if (errorMessage()) {
+          <p class="error-banner">{{ errorMessage() }}</p>
+        }
+
+        <button type="submit" class="btn-primary auth-submit" [disabled]="loading()">
+          @if (loading()) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            Kayıt Ol
+          }
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Zaten hesabın var mı? <a routerLink="/login">Giriş yap</a>
+      </div>
+    </div>
+  </main>
+</div>

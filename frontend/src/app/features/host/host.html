@@ -1,0 +1,36 @@
+<div class="host-page container">
+  <div class="host-header">
+    <div>
+      <h1>Ev Sahibi Paneli</h1>
+      <p>Hoş geldin {{ user()?.firstName }} 👋 Otellerini buradan yönetebilirsin.</p>
+    </div>
+    <span class="host-badge"><mat-icon inline>verified</mat-icon> Ev Sahibi</span>
+  </div>
+
+  <!-- Özet istatistikler (demo) -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <mat-icon>apartment</mat-icon>
+      <div><strong>0</strong><span>Otelin</span></div>
+    </div>
+    <div class="stat-card">
+      <mat-icon>meeting_room</mat-icon>
+      <div><strong>0</strong><span>Oda</span></div>
+    </div>
+    <div class="stat-card">
+      <mat-icon>event</mat-icon>
+      <div><strong>0</strong><span>Rezervasyon</span></div>
+    </div>
+  </div>
+
+  <!-- Otel ekleme (yakında) -->
+  <div class="add-hotel-card">
+    <div class="add-icon"><mat-icon>add_business</mat-icon></div>
+    <h2>İlk Otelini Ekle</h2>
+    <p>Tesisini listele, odalarını ve fiyatlarını belirle, rezervasyon almaya başla.</p>
+    <button class="btn-primary" disabled>Otel Ekle (yakında)</button>
+    <p class="note">Otel ekleme akışı bir sonraki adımda geliştirilecek.</p>
+  </div>
+
+  <a routerLink="/profile" class="back"><mat-icon inline>arrow_back</mat-icon> Profile dön</a>
+</div>

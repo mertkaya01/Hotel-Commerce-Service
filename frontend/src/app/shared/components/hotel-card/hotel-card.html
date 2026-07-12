@@ -1,0 +1,58 @@
+<article class="hotel-card">
+  <div class="photo-wrap">
+    <a [routerLink]="['/hotels', hotel().hotelCode]" class="photo-link">
+      @if (imgFailed()) {
+        <div class="photo photo--fallback"><mat-icon>apartment</mat-icon></div>
+      } @else {
+        <img
+          class="photo"
+          [src]="photo()"
+          [alt]="hotel().name"
+          loading="lazy"
+          width="600"
+          height="380"
+          (error)="onImgError()"
+        />
+      }
+    </a>
+
+    <button
+      class="fav-btn"
+      [class.active]="favorites.isFavorite(hotel().hotelCode)"
+      (click)="toggleFavorite($event)"
+      [attr.aria-label]="'Favorilere ekle'"
+    >
+      <mat-icon>{{ favorites.isFavorite(hotel().hotelCode) ? 'favorite' : 'favorite_border' }}</mat-icon>
+    </button>
+
+    <span class="score-badge">
+      {{ reviewScore() | number: '1.1-1' }}
+      <small>{{ reviewLabel() }}</small>
+    </span>
+  </div>
+
+  <div class="card-body">
+    <app-star-rating [rating]="hotel().rating" />
+
+    <a [routerLink]="['/hotels', hotel().hotelCode]" class="hotel-name">{{ hotel().name }}</a>
+
+    <p class="hotel-location">
+      <mat-icon inline>place</mat-icon>
+      {{ hotel().cityName }}, {{ hotel().countryName }}
+    </p>
+
+    <div class="tags">
+      @for (tag of tags(); track tag) {
+        <span class="tag">{{ tag }}</span>
+      }
+    </div>
+
+    <div class="card-footer">
+      <div class="price">
+        <span class="price-label">Gecelik</span>
+        <strong>{{ price() | number }} ₺</strong>
+      </div>
+      <a [routerLink]="['/hotels', hotel().hotelCode]" class="go-btn">Otele Git</a>
+    </div>
+  </div>
+</article>
