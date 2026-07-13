@@ -43,6 +43,10 @@ Gerçek bir otel veri seti (1M+ satır) üzerine kurulu, **tam yığın (full-st
 | Konteyner | Docker + docker-compose |
 
 ---
+## Veri Seti
+> https://www.kaggle.com/datasets/raj713335/tbo-hotels-dataset?resource=download
+> hotels-data-set filtrelenip kullanılmıştır.
+---
 
 ## 🚀 Çalıştırma
 
@@ -54,7 +58,7 @@ Gerçek bir otel veri seti (1M+ satır) üzerine kurulu, **tam yığın (full-st
 
 ```bash
 git clone <REPO_URL>
-cd STAJ
+cd <dosya_adi>
 docker compose up --build
 ```
 
@@ -158,7 +162,7 @@ Testler dış altyapıya (Solr) bağımlı değildir — `test` profilinde in-me
 ## 📁 Proje Yapısı
 
 ```
-STAJ/
+<dosya_adi>/
 ├── backend/          Spring Boot API
 │   └── src/main/java/com/stajproje/hotel/
 │       ├── entity/       JPA entity'leri
