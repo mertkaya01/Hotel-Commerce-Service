@@ -50,28 +50,22 @@
 
     <!-- Fotoğraflar -->
     <section class="card">
-      <div class="card-head">
-        <h2>Fotoğraflar</h2>
-        <button type="button" class="btn-outline sm" (click)="addPhoto()">
-          <mat-icon inline>add</mat-icon> Fotoğraf Ekle
-        </button>
-      </div>
-      <p class="hint">Fotoğraf bağlantısı (URL) yapıştır. Örn. bir görsel adresi.</p>
+      <h2>Fotoğraflar</h2>
+      <p class="hint">Hazır galeriden otelini yansıtan fotoğrafları seç ({{ selectedPhotos().size }} seçildi).</p>
 
-      <div formArrayName="photos">
-        @for (photo of photos.controls; track $index) {
-          <div class="photo-row">
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Fotoğraf URL {{ $index + 1 }}</mat-label>
-              <input matInput [formControlName]="$index" placeholder="https://..." />
-            </mat-form-field>
-            @if (photo.value) {
-              <img class="preview" [src]="photo.value" alt="önizleme" />
+      <div class="photo-grid">
+        @for (url of demoPhotos; track url) {
+          <button
+            type="button"
+            class="photo-tile"
+            [class.selected]="isPhotoSelected(url)"
+            (click)="togglePhoto(url)"
+          >
+            <img [src]="url" alt="otel fotoğrafı" loading="lazy" />
+            @if (isPhotoSelected(url)) {
+              <span class="tick"><mat-icon>check_circle</mat-icon></span>
             }
-            <button type="button" class="icon-remove" (click)="removePhoto($index)" [disabled]="photos.length === 1">
-              <mat-icon>close</mat-icon>
-            </button>
-          </div>
+          </button>
         }
       </div>
     </section>

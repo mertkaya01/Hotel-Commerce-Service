@@ -3,7 +3,6 @@ import { Component, inject, signal } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
-  FormControl,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -17,6 +16,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { HotelListingService } from '../../core/services/hotel-listing.service';
 import { HotelListingRequest } from '../../core/models/hotel-listing.model';
 import { SELECTABLE_AMENITIES } from '../../core/utils/amenities';
+import { DEMO_HOTEL_PHOTOS } from '../../core/utils/hotel-visuals';
 
 @Component({
   selector: 'app-add-hotel',
@@ -44,6 +44,10 @@ export class AddHotel {
   readonly amenityOptions = SELECTABLE_AMENITIES;
   readonly selectedAmenities = signal<Set<string>>(new Set());
 
+  // Geçici çözüm: gerçek dosya yükleme yerine hazır demo galeriden seç
+  readonly demoPhotos = DEMO_HOTEL_PHOTOS;
+  readonly selectedPhotos = signal<Set<string>>(new Set());
+
   readonly ratingOptions = [
     { value: 'FIVE_STAR', label: '5 Yıldız' },
     { value: 'FOUR_STAR', label: '4 Yıldız' },
@@ -60,20 +64,21 @@ export class AddHotel {
     rating: ['FOUR_STAR', [Validators.required]],
     address: [''],
     description: ['', [Validators.required, Validators.minLength(20)]],
-    photos: this.fb.array([this.newPhotoControl()]),
     rooms: this.fb.array([this.newRoomGroup()]),
   });
-
-  get photos(): FormArray {
-    return this.form.get('photos') as FormArray;
-  }
 
   get rooms(): FormArray {
     return this.form.get('rooms') as FormArray;
   }
 
-  private newPhotoControl(): FormControl {
-    return this.fb.control('', [Validators.required]);
+  togglePhoto(url: string): void {
+    const next = new Set(this.selectedPhotos());
+    next.has(url) ? next.delete(url) : next.add(url);
+    this.selectedPhotos.set(next);
+  }
+
+  isPhotoSelected(url: string): boolean {
+    return this.selectedPhotos().has(url);
   }
 
   private newRoomGroup() {
@@ -82,14 +87,6 @@ export class AddHotel {
       capacity: [2, [Validators.required, Validators.min(1)]],
       pricePerNight: [null, [Validators.required, Validators.min(1)]],
     });
-  }
-
-  addPhoto(): void {
-    this.photos.push(this.newPhotoControl());
-  }
-
-  removePhoto(i: number): void {
-    if (this.photos.length > 1) this.photos.removeAt(i);
   }
 
   addRoom(): void {
@@ -117,6 +114,11 @@ export class AddHotel {
       return;
     }
 
+    if (this.selectedPhotos().size === 0) {
+      this.errorMessage.set('En az bir fotoğraf seç.');
+      return;
+    }
+
     const raw = this.form.getRawValue();
     const request: HotelListingRequest = {
       name: raw.name!,
@@ -126,7 +128,7 @@ export class AddHotel {
       address: raw.address ?? '',
       description: raw.description!,
       amenities: Array.from(this.selectedAmenities()),
-      photos: (raw.photos as string[]).map((p) => p.trim()).filter((p) => p.length > 0),
+      photos: Array.from(this.selectedPhotos()),
       rooms: (raw.rooms as any[]).map((r) => ({
         roomType: r.roomType,
         capacity: Number(r.capacity),

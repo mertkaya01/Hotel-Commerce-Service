@@ -46,6 +46,14 @@ export function hotelPhoto(hotelCode: string): string {
   return `https://images.unsplash.com/${id}?w=600&h=380&fit=crop&q=80`;
 }
 
+/**
+ * Otel eklerken seçilebilecek hazır DEMO fotoğraf galerisi.
+ * (Gerçek dosya yükleme yerine geçici çözüm: ev sahibi buradan tıklayıp seçer.)
+ */
+export const DEMO_HOTEL_PHOTOS: string[] = HOTEL_PHOTO_IDS.map(
+  (id) => `https://images.unsplash.com/${id}?w=800&h=600&fit=crop&q=80`,
+);
+
 /** DEMO ortalama gecelik fiyat (yıldıza göre taban + otele özel sapma) */
 export function demoNightlyPrice(hotelCode: string, rating: string): number {
   const base = RATING_PRICE_BASE[rating] ?? RATING_PRICE_BASE['UNRATED'];
