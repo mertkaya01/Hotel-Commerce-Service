@@ -1,0 +1,164 @@
+@use 'mixins' as *;
+
+.add-page {
+  padding-block: 32px 60px;
+  max-width: 860px;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+  color: var(--brand-primary);
+  text-decoration: none;
+  font-weight: 600;
+
+  &:hover { text-decoration: underline; }
+}
+
+.add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+
+  h2 {
+    margin: 0 0 16px;
+    font-size: 1.15rem;
+  }
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+
+  h2 { margin: 0; }
+}
+
+.btn-outline.sm {
+  padding: 7px 14px;
+  font-size: 0.85rem;
+}
+
+.hint {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin: 0 0 12px;
+}
+
+.full-width { width: 100%; }
+
+.row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+
+  @include mobile { grid-template-columns: 1fr; }
+}
+
+/* Fotoğraflar */
+.photo-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  mat-form-field { flex: 1; }
+
+  .preview {
+    width: 64px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+}
+
+.icon-remove {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card-bg);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  transition: all var(--transition);
+
+  &:hover:not(:disabled) {
+    color: var(--danger);
+    border-color: var(--danger);
+  }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+/* Olanaklar */
+.amenity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.amenity-chip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--card-bg);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--transition);
+
+  mat-icon:not(.check) { color: var(--brand-primary); }
+
+  &:hover { border-color: var(--brand-primary-100); }
+
+  &.selected {
+    border-color: var(--brand-primary);
+    background: var(--brand-primary-050);
+    color: var(--brand-primary-dark);
+    font-weight: 600;
+  }
+
+  .check {
+    position: absolute;
+    right: 8px;
+    color: var(--brand-primary);
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Odalar */
+.room-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 12px;
+  align-items: start;
+
+  @include mobile { grid-template-columns: 1fr 1fr; }
+}
+
+.submit-btn {
+  align-self: flex-start;
+  padding: 14px 32px;
+}

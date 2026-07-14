@@ -33,6 +33,7 @@ export interface HotelDetail {
   websiteUrl: string | null;
   latitude: number | null;
   longitude: number | null;
+  photos: string[] | null;
 }
 
 export interface Room {

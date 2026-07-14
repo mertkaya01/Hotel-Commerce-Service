@@ -4,33 +4,64 @@
       <h1>Ev Sahibi Paneli</h1>
       <p>Hoş geldin {{ user()?.firstName }} 👋 Otellerini buradan yönetebilirsin.</p>
     </div>
-    <span class="host-badge"><mat-icon inline>verified</mat-icon> Ev Sahibi</span>
+    <a routerLink="/host/add-hotel" class="btn-primary add-btn">
+      <mat-icon inline>add_business</mat-icon> Otel Ekle
+    </a>
   </div>
 
-  <!-- Özet istatistikler (demo) -->
+  <!-- Özet istatistikler -->
   <div class="stat-grid">
     <div class="stat-card">
       <mat-icon>apartment</mat-icon>
-      <div><strong>0</strong><span>Otelin</span></div>
+      <div><strong>{{ approvedCount() }}</strong><span>Yayında Otel</span></div>
+    </div>
+    <div class="stat-card">
+      <mat-icon>hourglass_top</mat-icon>
+      <div><strong>{{ pendingCount() }}</strong><span>Onay Bekleyen</span></div>
     </div>
     <div class="stat-card">
       <mat-icon>meeting_room</mat-icon>
-      <div><strong>0</strong><span>Oda</span></div>
-    </div>
-    <div class="stat-card">
-      <mat-icon>event</mat-icon>
-      <div><strong>0</strong><span>Rezervasyon</span></div>
+      <div><strong>{{ roomCount() }}</strong><span>Toplam Oda</span></div>
     </div>
   </div>
 
-  <!-- Otel ekleme (yakında) -->
-  <div class="add-hotel-card">
-    <div class="add-icon"><mat-icon>add_business</mat-icon></div>
-    <h2>İlk Otelini Ekle</h2>
-    <p>Tesisini listele, odalarını ve fiyatlarını belirle, rezervasyon almaya başla.</p>
-    <button class="btn-primary" disabled>Otel Ekle (yakında)</button>
-    <p class="note">Otel ekleme akışı bir sonraki adımda geliştirilecek.</p>
-  </div>
+  <!-- Otellerim -->
+  <h2 class="my-hotels-title">Otellerim</h2>
+
+  @if (loading()) {
+    <div class="center"><mat-spinner diameter="36"></mat-spinner></div>
+  } @else if (listings().length === 0) {
+    <div class="add-hotel-card">
+      <div class="add-icon"><mat-icon>add_business</mat-icon></div>
+      <h2>İlk Otelini Ekle</h2>
+      <p>Tesisini listele, odalarını ve fiyatlarını belirle. Onaydan sonra aramada görünür.</p>
+      <a routerLink="/host/add-hotel" class="btn-primary">Otel Ekle</a>
+    </div>
+  } @else {
+    <div class="my-list">
+      @for (item of listings(); track item.id) {
+        <div class="my-card">
+          <div class="thumb">
+            @if (item.photos.length > 0) {
+              <img [src]="item.photos[0]" [alt]="item.name" />
+            } @else {
+              <div class="thumb-fallback"><mat-icon>apartment</mat-icon></div>
+            }
+          </div>
+          <div class="info">
+            <div class="top">
+              <strong>{{ item.name }}</strong>
+              <span class="status" [class]="item.status.toLowerCase()">{{ statusLabel(item.status) }}</span>
+            </div>
+            <span class="loc">{{ item.cityName }}, {{ item.countryName }} · {{ item.roomCount }} oda</span>
+          </div>
+          @if (item.status === 'APPROVED') {
+            <a [routerLink]="['/hotels', item.hotelCode]" class="view">Görüntüle</a>
+          }
+        </div>
+      }
+    </div>
+  }
 
   <a routerLink="/profile" class="back"><mat-icon inline>arrow_back</mat-icon> Profile dön</a>
 </div>

@@ -9,6 +9,8 @@ import { Favorites } from './features/favorites/favorites';
 import { Host } from './features/host/host';
 import { BecomeHost } from './features/become-host/become-host';
 import { HostApplications } from './features/host-applications/host-applications';
+import { AddHotel } from './features/add-hotel/add-hotel';
+import { HotelListings } from './features/hotel-listings/hotel-listings';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
 import { superAdminGuard } from './core/guards/super-admin.guard';
@@ -21,7 +23,9 @@ export const routes: Routes = [
   { path: 'profile', component: Profile, canActivate: [authGuard] },
   { path: 'become-host', component: BecomeHost, canActivate: [authGuard] },
   { path: 'host', component: Host, canActivate: [adminGuard] },
+  { path: 'host/add-hotel', component: AddHotel, canActivate: [adminGuard] },
   { path: 'host/applications', component: HostApplications, canActivate: [superAdminGuard] },
+  { path: 'host/hotel-listings', component: HotelListings, canActivate: [superAdminGuard] },
   { path: 'login', component: Login },
   { path: 'register', component: Register },
   { path: '**', redirectTo: '' },

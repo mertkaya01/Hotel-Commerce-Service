@@ -105,6 +105,8 @@ public class HotelService {
 
         HotelDetailResponse response = modelMapper.map(hotel, HotelDetailResponse.class);
         response.setRating(hotel.getRating() != null ? hotel.getRating().name() : null);
+        // ev sahibi fotoğrafları (open-in-view sayesinde lazy koleksiyon burada yüklenir)
+        response.setPhotos(new ArrayList<>(hotel.getPhotos()));
         return response;
     }
 

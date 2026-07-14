@@ -104,8 +104,12 @@ export class HotelDetail {
     return room ? room.pricePerNight * this.nights() : 0;
   });
 
-  // ---- görsel / demo veriler (otele sabit) ----
-  readonly gallery = computed(() => hotelGallery(this.hotelCode(), 5));
+  // ---- görsel / demo veriler ----
+  // Ev sahibinin eklediği gerçek fotoğraflar varsa onları, yoksa üretilen görselleri kullan
+  readonly gallery = computed(() => {
+    const real = this.hotel()?.photos;
+    return real && real.length > 0 ? real : hotelGallery(this.hotelCode(), 5);
+  });
   readonly reviewScore = computed(() => demoReviewScore(this.hotelCode()));
   readonly reviewCount = computed(() => demoReviewCount(this.hotelCode()));
   readonly reviewLabel = computed(() => reviewScoreLabel(this.reviewScore()));

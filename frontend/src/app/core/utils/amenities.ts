@@ -11,6 +11,31 @@ export interface Amenity {
   label: string;
 }
 
+// Otel ekleme formunda ev sahibinin seçebileceği olanaklar.
+// `key` -> facilities metnine yazılır (parseAmenities bunu tanır).
+export interface SelectableAmenity {
+  key: string;
+  label: string;
+  icon: string;
+}
+
+export const SELECTABLE_AMENITIES: SelectableAmenity[] = [
+  { key: 'wifi', label: 'Ücretsiz Wi-Fi', icon: 'wifi' },
+  { key: 'pool', label: 'Havuz', icon: 'pool' },
+  { key: 'parking', label: 'Otopark', icon: 'local_parking' },
+  { key: 'breakfast', label: 'Kahvaltı', icon: 'bakery_dining' },
+  { key: 'restaurant', label: 'Restoran', icon: 'restaurant' },
+  { key: 'bar', label: 'Bar', icon: 'local_bar' },
+  { key: 'spa', label: 'Spa', icon: 'spa' },
+  { key: 'sauna', label: 'Sauna', icon: 'whatshot' },
+  { key: 'fitness', label: 'Fitness', icon: 'fitness_center' },
+  { key: 'air condition', label: 'Klima', icon: 'ac_unit' },
+  { key: 'room service', label: 'Oda Servisi', icon: 'room_service' },
+  { key: 'airport shuttle', label: 'Havaalanı Servisi', icon: 'airport_shuttle' },
+  { key: 'pets', label: 'Evcil Hayvan', icon: 'pets' },
+  { key: 'elevator', label: 'Asansör', icon: 'elevator' },
+];
+
 export interface AmenityGroup {
   category: string;
   items: Amenity[];

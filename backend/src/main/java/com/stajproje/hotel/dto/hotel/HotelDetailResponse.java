@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Builder
@@ -26,4 +28,6 @@ public class HotelDetailResponse {
     private String websiteUrl;
     private Double latitude;
     private Double longitude;
+    // ev sahibinin eklediği fotoğraflar (boşsa frontend üretilen görselleri kullanır)
+    private List<String> photos;
 }
