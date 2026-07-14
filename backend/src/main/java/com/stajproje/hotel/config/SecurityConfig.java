@@ -4,6 +4,7 @@ import com.stajproje.hotel.security.CustomUserDetailsService;
 import com.stajproje.hotel.security.JwtAuthFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -77,10 +78,15 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // İzin verilen origin'ler env/property ile ayarlanabilir (deploy'da APP_CORS_ORIGINS).
+    // Virgülle ayrılmış liste; varsayılan yerel geliştirme.
+    @Value("${app.cors.origins:http://localhost:4200}")
+    private String corsOrigins;
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+        configuration.setAllowedOrigins(List.of(corsOrigins.split(",")));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
