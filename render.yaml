@@ -10,9 +10,16 @@ services:
       url: solr:9.10
     region: frankfurt
     plan: free
-    # Solr'u Render'ın verdiği $PORT üzerinde dinlet + hotels core'unu oluştur
-    dockerCommand: bash -c "export SOLR_PORT=$PORT && solr-precreate hotels"
+    # Solr imajinin belgelenmis kullanimi (docker-compose.yml ile ayni): entrypoint
+    # docker-entrypoint.sh bu komutu calistirir ve 'hotels' core'unu olusturur.
+    # NOT: burada 'bash -c "..."' KULLANMA — Render tirnaklari oldugu gibi geciriyor,
+    # bash tum satiri tek komut adi sanip 'command not found' (exit 127) veriyor.
+    dockerCommand: solr-precreate hotels
     envVars:
+      # Solr, Render'in bekledigi portu dinlesin (Render'in varsayilan PORT'u 10000).
+      # Solr varsayilan 8983'te acilirsa Render servisi "canli" goremez.
+      - key: SOLR_PORT
+        value: "10000"
       - key: SOLR_HEAP
         value: 300m
 
