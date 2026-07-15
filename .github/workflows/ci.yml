@@ -1,0 +1,66 @@
+name: CI
+
+# Her push ve pull request'te backend + frontend derlenir ve testler kosar.
+# Boylece bozuk kod main'e girmeden yakalanir.
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: Backend (Spring Boot + JUnit)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Java 21 kur
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Derle ve testleri calistir
+        # Testler dis altyapiya (Solr) bagimli degil: 'test' profilinde
+        # in-memory H2 kullanilir, Solr bilesenleri @Profile("!test") ile kapali.
+        run: ./mvnw --batch-mode verify
+
+      - name: Test raporlarini yukle
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: backend/target/surefire-reports/
+          if-no-files-found: ignore
+
+  frontend:
+    name: Frontend (Angular + Vitest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Node 22 kur
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Bagimliliklari kur
+        run: npm ci
+
+      - name: Testleri calistir
+        run: npx ng test --watch=false
+
+      - name: Production build
+        run: npm run build
