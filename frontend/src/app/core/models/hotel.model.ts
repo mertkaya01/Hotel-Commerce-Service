@@ -44,11 +44,15 @@ export interface Room {
   pricePerNight: number;
 }
 
+/** Backend'in desteklediği sıralamalar (fiyat demo olduğu için listede yok). */
+export type HotelSort = 'relevance' | 'name_asc' | 'name_desc' | 'rating_desc' | 'rating_asc';
+
 export interface HotelSearchParams {
   q?: string;
   country?: string;
   city?: string;
   rating?: string;
+  sort?: HotelSort;
   page?: number;
   size?: number;
 }

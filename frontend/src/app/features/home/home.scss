@@ -338,6 +338,33 @@
     border-radius: var(--radius-pill);
     font-size: 0.85rem;
   }
+
+  .sort-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    font-size: 0.88rem;
+
+    mat-icon { color: var(--brand-primary); }
+
+    .sort-label { color: var(--text-muted); }
+
+    .sort-select {
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--card-bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover { border-color: var(--brand-primary); }
+      &:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 1px; }
+    }
+  }
 }
 
 .pagination {

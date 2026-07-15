@@ -34,6 +34,10 @@ public class SolrSchemaInitializer {
             field("cityText", "text_general", true),
             field("countryText", "text_general", true),
             field("rating", "string", true),
+            // Siralama icin: 'name' text_general oldugundan siralanamaz; 'rating' ise
+            // string oldugundan alfabetik (yanlis) siralanir. Bu ikisi siralamaya ozel.
+            field("nameSort", "string", true),
+            field("ratingValue", "pint", true),
             field("address", "text_general", true),
             field("description", "text_general", true),
             field("facilities", "text_general", true),

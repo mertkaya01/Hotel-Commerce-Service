@@ -20,6 +20,7 @@ export class HotelService {
     if (params.country) httpParams = httpParams.set('country', params.country);
     if (params.city) httpParams = httpParams.set('city', params.city);
     if (params.rating) httpParams = httpParams.set('rating', params.rating);
+    if (params.sort && params.sort !== 'relevance') httpParams = httpParams.set('sort', params.sort);
     httpParams = httpParams.set('page', String(params.page ?? 0));
     httpParams = httpParams.set('size', String(params.size ?? 12));
 

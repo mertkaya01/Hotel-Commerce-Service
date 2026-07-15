@@ -87,6 +87,20 @@
           @if (selectedDatesLabel) {
             <span class="date-chip"><mat-icon inline>calendar_month</mat-icon> {{ selectedDatesLabel }}</span>
           }
+
+          <label class="sort-box">
+            <mat-icon inline>swap_vert</mat-icon>
+            <span class="sort-label">Sırala:</span>
+            <select
+              class="sort-select"
+              [value]="sort()"
+              (change)="onSortChange($any($event.target).value)"
+            >
+              @for (opt of sortOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </label>
         </div>
 
         @if (loading()) {
