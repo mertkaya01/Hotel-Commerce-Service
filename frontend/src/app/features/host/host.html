@@ -43,7 +43,7 @@
         <div class="my-card">
           <div class="thumb">
             @if (item.photos.length > 0) {
-              <img [src]="item.photos[0]" [alt]="item.name" />
+              <img [src]="photoUrl(item.photos[0])" [alt]="item.name" />
             } @else {
               <div class="thumb-fallback"><mat-icon>apartment</mat-icon></div>
             }

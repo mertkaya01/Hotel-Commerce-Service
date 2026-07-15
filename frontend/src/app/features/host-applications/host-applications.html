@@ -68,7 +68,7 @@
             <div class="hotel-card">
               <div class="thumb">
                 @if (h.photos.length > 0) {
-                  <img [src]="h.photos[0]" [alt]="h.name" />
+                  <img [src]="photoUrl(h.photos[0])" [alt]="h.name" />
                 } @else {
                   <div class="thumb-fallback"><mat-icon>apartment</mat-icon></div>
                 }

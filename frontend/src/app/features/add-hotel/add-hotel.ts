@@ -7,6 +7,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -17,6 +18,7 @@ import { HotelListingService } from '../../core/services/hotel-listing.service';
 import { HotelListingRequest } from '../../core/models/hotel-listing.model';
 import { SELECTABLE_AMENITIES } from '../../core/utils/amenities';
 import { DEMO_HOTEL_PHOTOS } from '../../core/utils/hotel-visuals';
+import { resolveFileUrl } from '../../core/utils/file-url';
 
 @Component({
   selector: 'app-add-hotel',
@@ -44,9 +46,54 @@ export class AddHotel {
   readonly amenityOptions = SELECTABLE_AMENITIES;
   readonly selectedAmenities = signal<Set<string>>(new Set());
 
-  // Geçici çözüm: gerçek dosya yükleme yerine hazır demo galeriden seç
+  // Fotoğraf: ya bilgisayardan yükle ya da hazır demo galeriden seç
   readonly demoPhotos = DEMO_HOTEL_PHOTOS;
   readonly selectedPhotos = signal<Set<string>>(new Set());
+  readonly uploadedPhotos = signal<string[]>([]);
+  readonly uploading = signal(false);
+
+  /** Önizleme için: /uploads/... yolunu tam adrese çevirir. */
+  previewUrl(url: string): string {
+    return resolveFileUrl(url);
+  }
+
+  onFilesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []);
+    if (files.length === 0) return;
+
+    this.uploading.set(true);
+    this.errorMessage.set(null);
+
+    // Dosyaları sırayla yükle, dönen URL'leri seçili fotoğraflara ekle
+    forkJoin(files.map((f) => this.listingService.uploadPhoto(f))).subscribe({
+      next: (responses) => {
+        const urls = responses.map((r) => r.url);
+        this.uploadedPhotos.update((list) => [...list, ...urls]);
+        this.selectedPhotos.update((set) => {
+          const next = new Set(set);
+          urls.forEach((u) => next.add(u));
+          return next;
+        });
+        this.uploading.set(false);
+        input.value = ''; // aynı dosya tekrar seçilebilsin
+      },
+      error: (err: HttpErrorResponse) => {
+        this.uploading.set(false);
+        this.errorMessage.set(err.error?.message ?? 'Fotoğraf yüklenemedi');
+        input.value = '';
+      },
+    });
+  }
+
+  removeUploaded(url: string): void {
+    this.uploadedPhotos.update((list) => list.filter((u) => u !== url));
+    this.selectedPhotos.update((set) => {
+      const next = new Set(set);
+      next.delete(url);
+      return next;
+    });
+  }
 
   readonly ratingOptions = [
     { value: 'FIVE_STAR', label: '5 Yıldız' },

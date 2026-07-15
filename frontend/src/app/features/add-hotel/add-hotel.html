@@ -51,7 +51,41 @@
     <!-- Fotoğraflar -->
     <section class="card">
       <h2>Fotoğraflar</h2>
-      <p class="hint">Hazır galeriden otelini yansıtan fotoğrafları seç ({{ selectedPhotos().size }} seçildi).</p>
+      <p class="hint">Bilgisayarından yükle ya da hazır galeriden seç ({{ selectedPhotos().size }} seçildi).</p>
+
+      <!-- Bilgisayardan yükleme -->
+      <label class="upload-box">
+        <input
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/gif"
+          multiple
+          hidden
+          (change)="onFilesSelected($event)"
+        />
+        @if (uploading()) {
+          <mat-spinner diameter="26"></mat-spinner>
+          <span>Yükleniyor...</span>
+        } @else {
+          <mat-icon>cloud_upload</mat-icon>
+          <span><strong>Fotoğraf yükle</strong> — tıkla ve bilgisayarından seç</span>
+          <small>JPG, PNG, WEBP veya GIF · en fazla 5MB</small>
+        }
+      </label>
+
+      @if (uploadedPhotos().length > 0) {
+        <div class="uploaded-grid">
+          @for (url of uploadedPhotos(); track url) {
+            <div class="uploaded-tile">
+              <img [src]="previewUrl(url)" alt="yüklenen fotoğraf" />
+              <button type="button" class="remove-up" (click)="removeUploaded(url)" aria-label="Kaldır">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <p class="or-line">veya hazır galeriden seç</p>
 
       <div class="photo-grid">
         @for (url of demoPhotos; track url) {

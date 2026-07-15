@@ -2,6 +2,8 @@ HELP.md
 target/
 # Yalnizca kok backend/data (H2 dosyalari) — src/main/resources/data (subset CSV) haric
 /data/
+# Kullanicilarin yukledigi otel fotograflari (repoya girmemeli)
+/uploads/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

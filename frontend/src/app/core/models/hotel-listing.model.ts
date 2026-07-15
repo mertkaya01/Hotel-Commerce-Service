@@ -4,6 +4,10 @@ export interface RoomInput {
   pricePerNight: number;
 }
 
+export interface UploadResponse {
+  url: string; // orn. /uploads/ab12....jpg
+}
+
 export interface HotelListingRequest {
   name: string;
   countryName: string;

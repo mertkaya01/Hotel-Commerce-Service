@@ -65,6 +65,79 @@
   @include mobile { grid-template-columns: 1fr; }
 }
 
+/* Fotoğraflar — bilgisayardan yükleme */
+.upload-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 26px;
+  margin-bottom: 16px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--brand-primary-050);
+  color: var(--text);
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--transition);
+
+  &:hover {
+    border-color: var(--brand-primary);
+  }
+
+  mat-icon {
+    color: var(--brand-primary);
+    font-size: 34px;
+    width: 34px;
+    height: 34px;
+  }
+
+  small { color: var(--text-muted); font-size: 0.78rem; }
+}
+
+.uploaded-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.uploaded-tile {
+  position: relative;
+  border: 2px solid var(--brand-primary);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+
+  img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .remove-up {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 26px;
+    height: 26px;
+    border: none;
+    border-radius: 50%;
+    background: rgb(0 0 0 / 0.55);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    mat-icon { font-size: 16px; width: 16px; height: 16px; }
+    &:hover { background: var(--danger); }
+  }
+}
+
+.or-line {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin: 0 0 12px;
+}
+
 /* Fotoğraflar — demo galeriden seçim */
 .photo-grid {
   display: grid;

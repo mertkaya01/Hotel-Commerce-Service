@@ -5,6 +5,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../core/services/auth.service';
 import { HotelListingService } from '../../core/services/hotel-listing.service';
 import { HotelListing } from '../../core/models/hotel-listing.model';
+import { resolveFileUrl } from '../../core/utils/file-url';
 
 @Component({
   selector: 'app-host',
@@ -40,5 +41,10 @@ export class Host {
 
   statusLabel(status: string): string {
     return status === 'APPROVED' ? 'Yayında' : status === 'PENDING' ? 'Onay Bekliyor' : 'Reddedildi';
+  }
+
+  /** Yüklenen fotoğrafların göreceli yolunu tam adrese çevirir. */
+  photoUrl(url: string): string {
+    return resolveFileUrl(url);
   }
 }

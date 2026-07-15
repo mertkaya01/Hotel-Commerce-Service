@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { HotelListing, HotelListingRequest } from '../models/hotel-listing.model';
+import { HotelListing, HotelListingRequest, UploadResponse } from '../models/hotel-listing.model';
 
 @Injectable({ providedIn: 'root' })
 export class HotelListingService {
@@ -12,6 +12,13 @@ export class HotelListingService {
   // Ev sahibi
   submit(request: HotelListingRequest): Observable<HotelListing> {
     return this.http.post<HotelListing>(this.apiUrl, request);
+  }
+
+  /** Otel fotografi yukler; backend kaydedip erisim yolunu doner. */
+  uploadPhoto(file: File): Observable<UploadResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<UploadResponse>(`${environment.apiUrl}/uploads/photo`, formData);
   }
 
   getMyListings(): Observable<HotelListing[]> {
