@@ -6,6 +6,9 @@ import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
 import org.apache.solr.common.SolrInputDocument;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * Bir Hotel'i Solr dokumanina cevirip indexler. Hem ilk CSV import'unda
  * (CsvImportRunner) hem de yeniden indexlemede (SolrReindexRunner) kullanilir;
@@ -17,7 +20,29 @@ public class SolrHotelIndexer {
 
     private final HttpJdkSolrClient solrClient;
 
+    /** Tek otel indexler (orn. ev sahibinin oteli onaylandiginda). */
     public void index(Hotel hotel) throws Exception {
+        solrClient.add(toDocument(hotel));
+    }
+
+    /**
+     * Otelleri TEK HTTP istegiyle indexler.
+     *
+     * NEDEN: index() her cagrida Solr'a ayri bir HTTP istegi atar. Yerelde Solr
+     * localhost'ta oldugu icin bu farkedilmez; ancak deploy'da backend ve Solr
+     * AYRI SERVISLER olduğundan her istek ag uzerinden gider. 5000 otel = 5000
+     * istek = dakikalarca sure + Solr'da gereksiz yuk. Toplu gonderim bunu
+     * ~10 istege dusurur.
+     */
+    public void indexAll(Collection<Hotel> hotels) throws Exception {
+        if (hotels.isEmpty()) {
+            return;
+        }
+        List<SolrInputDocument> docs = hotels.stream().map(this::toDocument).toList();
+        solrClient.add(docs);
+    }
+
+    private SolrInputDocument toDocument(Hotel hotel) {
         SolrInputDocument doc = new SolrInputDocument();
         doc.addField("id", hotel.getHotelCode());
         doc.addField("hotelCode", hotel.getHotelCode());
@@ -42,7 +67,7 @@ public class SolrHotelIndexer {
             doc.addField("location", hotel.getLatitude() + "," + hotel.getLongitude());
         }
 
-        solrClient.add(doc);
+        return doc;
     }
 
     public void commit() throws Exception {

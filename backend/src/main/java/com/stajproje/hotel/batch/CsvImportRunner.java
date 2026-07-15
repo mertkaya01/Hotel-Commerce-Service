@@ -44,6 +44,9 @@ public class CsvImportRunner implements CommandLineRunner {
 
     private static final Random RANDOM = new Random();
 
+    /** Kac oteli tek Solr istegiyle gonderecegimiz. */
+    private static final int SOLR_BATCH_SIZE = 500;
+
     @Override
     public void run(String... args) throws Exception {
         if (hotelRepository.count() > 0) {
@@ -55,6 +58,8 @@ public class CsvImportRunner implements CommandLineRunner {
         int imported = 0;
         int duplicateSkipped = 0;
         Set<String> seenHotelCodes = new HashSet<>();
+        // Solr'a tek tek degil toplu gonderiyoruz (bkz. SolrHotelIndexer.indexAll)
+        List<Hotel> solrBatch = new ArrayList<>(SOLR_BATCH_SIZE);
 
         try (var inputStream = new ClassPathResource(csvPath).getInputStream();
              var reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
@@ -79,14 +84,20 @@ public class CsvImportRunner implements CommandLineRunner {
                 hotelRepository.save(hotel);
                 List<Room> rooms = generateRooms(hotel);
                 roomRepository.saveAll(rooms);
-                solrIndexer.index(hotel);
                 imported++;
 
-                if (imported % 500 == 0) {
+                solrBatch.add(hotel);
+                if (solrBatch.size() >= SOLR_BATCH_SIZE) {
+                    solrIndexer.indexAll(solrBatch);
+                    solrBatch.clear();
                     log.info("{} otel import edildi...", imported);
                 }
             }
         }
+
+        // son (tam dolmamis) parti
+        solrIndexer.indexAll(solrBatch);
+        solrBatch.clear();
 
         solrIndexer.commit();
         log.info("CSV import tamamlandi. Toplam {} otel yuklendi, {} duplicate hotelCode atlandi.", imported, duplicateSkipped);

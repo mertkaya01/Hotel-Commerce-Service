@@ -12,6 +12,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Kendi kendini onaran Solr yeniden-indexleyici.
  *
@@ -28,6 +31,9 @@ import org.springframework.stereotype.Component;
 @Profile("!test")
 @RequiredArgsConstructor
 public class SolrReindexRunner implements CommandLineRunner {
+
+    /** Kac oteli tek Solr istegiyle gonderecegimiz. */
+    private static final int SOLR_BATCH_SIZE = 500;
 
     private final HotelRepository hotelRepository;
     private final HttpJdkSolrClient solrClient;
@@ -53,13 +59,18 @@ public class SolrReindexRunner implements CommandLineRunner {
                 hotelCount, solrCount, missingSortFields);
 
         int reindexed = 0;
+        List<Hotel> batch = new ArrayList<>(SOLR_BATCH_SIZE);
         for (Hotel hotel : hotelRepository.findAll()) {
-            solrIndexer.index(hotel);
+            batch.add(hotel);
             reindexed++;
-            if (reindexed % 1000 == 0) {
+            // tek tek degil toplu gonder (bkz. SolrHotelIndexer.indexAll)
+            if (batch.size() >= SOLR_BATCH_SIZE) {
+                solrIndexer.indexAll(batch);
+                batch.clear();
                 log.info("{} otel yeniden indexlendi...", reindexed);
             }
         }
+        solrIndexer.indexAll(batch);
         solrIndexer.commit();
         log.info("Solr yeniden indexleme tamamlandi. {} otel indexlendi.", reindexed);
     }

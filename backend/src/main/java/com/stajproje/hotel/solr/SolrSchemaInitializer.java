@@ -46,18 +46,29 @@ public class SolrSchemaInitializer {
             field("websiteUrl", "string", false)
     );
 
+    /**
+     * Eksik sema alanlarini TEK istekte ekler.
+     *
+     * NEDEN toplu: her AddField istegi Solr'da core'un yeniden yuklenmesini
+     * tetikler (searcher kapanir/acilir). Alanlari tek tek eklemek ilk acilista
+     * 14 ard arda reload demekti; bu, kucuk bellekli bir Solr'u zorluyor.
+     * MultiUpdate ile tek reload yeter.
+     */
     @PostConstruct
     public void ensureSchema() throws Exception {
         Set<String> existingFields = fetchExistingFieldNames();
 
-        for (Map<String, Object> fieldDef : REQUIRED_FIELDS) {
-            String fieldName = (String) fieldDef.get("name");
-            if (existingFields.contains(fieldName)) {
-                continue;
-            }
-            new SchemaRequest.AddField(fieldDef).process(solrClient);
-            log.info("Solr sema alani eklendi: {}", fieldName);
+        List<SchemaRequest.Update> missing = REQUIRED_FIELDS.stream()
+                .filter(f -> !existingFields.contains((String) f.get("name")))
+                .map(f -> (SchemaRequest.Update) new SchemaRequest.AddField(f))
+                .toList();
+
+        if (missing.isEmpty()) {
+            return;
         }
+
+        new SchemaRequest.MultiUpdate(missing).process(solrClient);
+        log.info("Solr semasina {} alan tek istekte eklendi.", missing.size());
     }
 
     private Set<String> fetchExistingFieldNames() throws Exception {

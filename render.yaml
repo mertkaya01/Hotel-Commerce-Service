@@ -22,8 +22,13 @@ services:
       # Solr varsayilan 8983'te acilirsa Render servisi "canli" goremez.
       - key: SOLR_PORT
         value: "10000"
+      # 512MB'lik kutuda heap disi (metaspace, thread, buffer) ~150-200MB tutuyor.
+      # 300m heap ile toplam sinira dayanip container OOM-kill yiyorduk; 256m daha
+      # guvenli — 5000 kucuk dokuman icin fazlasiyla yeterli.
+      # NOT: Solr imaji -XX:+CrashOnOutOfMemoryError ile acilir, yani HERHANGI bir
+      # OOM'da servis komple cokuyor (yavaslamiyor).
       - key: SOLR_HEAP
-        value: 300m
+        value: 256m
 
   # 2) Spring Boot backend
   - type: web
