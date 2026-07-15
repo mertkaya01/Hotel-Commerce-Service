@@ -5,11 +5,11 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://RENDER_BACKEND_URL.onrender.com/api/$1"
+      "destination": "https://hotel-backend-5zna.onrender.com/api/$1"
     },
     {
       "source": "/uploads/(.*)",
-      "destination": "https://RENDER_BACKEND_URL.onrender.com/uploads/$1"
+      "destination": "https://hotel-backend-5zna.onrender.com/uploads/$1"
     },
     {
       "source": "/(.*)",
