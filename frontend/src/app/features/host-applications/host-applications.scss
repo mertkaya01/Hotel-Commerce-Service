@@ -4,6 +4,92 @@
   padding-block: 32px 60px;
 }
 
+.app-section {
+  margin-bottom: 40px;
+}
+
+.block-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.2rem;
+  margin: 0 0 16px;
+
+  mat-icon { color: var(--brand-primary); }
+
+  .count {
+    background: var(--brand-primary);
+    color: #fff;
+    font-size: 0.8rem;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 7px;
+    border-radius: 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Otel başvuru kartları */
+.hotel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.hotel-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+
+  @include mobile { flex-wrap: wrap; }
+
+  .thumb {
+    width: 96px;
+    height: 72px;
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+
+    .thumb-fallback {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--brand-primary-050);
+      color: var(--brand-primary);
+    }
+  }
+
+  .hotel-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+
+    strong { color: var(--text-strong); }
+    .loc { color: var(--text-muted); font-size: 0.85rem; }
+    .owner {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+  }
+
+  .app-actions { flex: 0 0 auto; }
+}
+
 .back {
   display: inline-flex;
   align-items: center;

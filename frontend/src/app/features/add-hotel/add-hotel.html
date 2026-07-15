@@ -1,0 +1,176 @@
+<div class="add-page container">
+  <a routerLink="/host" class="back"><mat-icon inline>arrow_back</mat-icon> Ev Sahibi Paneli</a>
+  <h1 class="section-title">Otel Ekle</h1>
+  <p class="section-subtitle">Otelini oluştur. Platform yöneticisi onayladıktan sonra aramada görünür.</p>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="add-form">
+    <!-- Temel bilgiler -->
+    <section class="card">
+      <h2>Otel Bilgileri</h2>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Otel Adı</mat-label>
+        <input matInput formControlName="name" />
+        @if (form.controls.name.hasError('required') && form.controls.name.touched) {
+          <mat-error>Otel adı boş olamaz</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="row-3">
+        <mat-form-field appearance="outline">
+          <mat-label>Şehir</mat-label>
+          <input matInput formControlName="cityName" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Ülke</mat-label>
+          <input matInput formControlName="countryName" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Yıldız</mat-label>
+          <mat-select formControlName="rating">
+            @for (r of ratingOptions; track r.value) {
+              <mat-option [value]="r.value">{{ r.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Adres</mat-label>
+        <input matInput formControlName="address" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Açıklama</mat-label>
+        <textarea matInput formControlName="description" rows="4"></textarea>
+        @if (form.controls.description.hasError('minlength') && form.controls.description.touched) {
+          <mat-error>En az 20 karakter yaz</mat-error>
+        }
+      </mat-form-field>
+    </section>
+
+    <!-- Fotoğraflar -->
+    <section class="card">
+      <h2>Fotoğraflar</h2>
+      <p class="hint">Bilgisayarından yükle ya da hazır galeriden seç ({{ selectedPhotos().size }} seçildi).</p>
+
+      <!-- Bilgisayardan yükleme -->
+      <label class="upload-box">
+        <input
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/gif"
+          multiple
+          hidden
+          (change)="onFilesSelected($event)"
+        />
+        @if (uploading()) {
+          <mat-spinner diameter="26"></mat-spinner>
+          <span>Yükleniyor...</span>
+        } @else {
+          <mat-icon>cloud_upload</mat-icon>
+          <span><strong>Fotoğraf yükle</strong> — tıkla ve bilgisayarından seç</span>
+          <small>JPG, PNG, WEBP veya GIF · en fazla 5MB</small>
+        }
+      </label>
+
+      @if (uploadedPhotos().length > 0) {
+        <div class="uploaded-grid">
+          @for (url of uploadedPhotos(); track url) {
+            <div class="uploaded-tile">
+              <img [src]="previewUrl(url)" alt="yüklenen fotoğraf" />
+              <button type="button" class="remove-up" (click)="removeUploaded(url)" aria-label="Kaldır">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <p class="or-line">veya hazır galeriden seç</p>
+
+      <div class="photo-grid">
+        @for (url of demoPhotos; track url) {
+          <button
+            type="button"
+            class="photo-tile"
+            [class.selected]="isPhotoSelected(url)"
+            (click)="togglePhoto(url)"
+          >
+            <img [src]="url" alt="otel fotoğrafı" loading="lazy" />
+            @if (isPhotoSelected(url)) {
+              <span class="tick"><mat-icon>check_circle</mat-icon></span>
+            }
+          </button>
+        }
+      </div>
+    </section>
+
+    <!-- Olanaklar -->
+    <section class="card">
+      <h2>Olanaklar</h2>
+      <div class="amenity-grid">
+        @for (a of amenityOptions; track a.key) {
+          <button
+            type="button"
+            class="amenity-chip"
+            [class.selected]="isAmenitySelected(a.key)"
+            (click)="toggleAmenity(a.key)"
+          >
+            <mat-icon>{{ a.icon }}</mat-icon>
+            <span>{{ a.label }}</span>
+            @if (isAmenitySelected(a.key)) {
+              <mat-icon class="check">check_circle</mat-icon>
+            }
+          </button>
+        }
+      </div>
+    </section>
+
+    <!-- Odalar -->
+    <section class="card">
+      <div class="card-head">
+        <h2>Odalar</h2>
+        <button type="button" class="btn-outline sm" (click)="addRoom()">
+          <mat-icon inline>add</mat-icon> Oda Ekle
+        </button>
+      </div>
+
+      <div formArrayName="rooms">
+        @for (room of rooms.controls; track $index) {
+          <div class="room-row" [formGroupName]="$index">
+            <mat-form-field appearance="outline">
+              <mat-label>Oda Tipi</mat-label>
+              <mat-select formControlName="roomType">
+                @for (t of roomTypes; track t) {
+                  <mat-option [value]="t">{{ t }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Kapasite</mat-label>
+              <input matInput type="number" formControlName="capacity" min="1" />
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Gecelik Fiyat (₺)</mat-label>
+              <input matInput type="number" formControlName="pricePerNight" min="1" />
+            </mat-form-field>
+            <button type="button" class="icon-remove" (click)="removeRoom($index)" [disabled]="rooms.length === 1">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+    </section>
+
+    @if (errorMessage()) {
+      <p class="error-banner">{{ errorMessage() }}</p>
+    }
+
+    <button type="submit" class="btn-primary submit-btn" [disabled]="submitting()">
+      @if (submitting()) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        Onaya Gönder
+      }
+    </button>
+  </form>
+</div>

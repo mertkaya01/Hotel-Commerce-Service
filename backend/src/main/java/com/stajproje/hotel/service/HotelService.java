@@ -34,8 +34,27 @@ public class HotelService {
     private final RoomRepository roomRepository;
     private final ModelMapper modelMapper;
 
+    /**
+     * Desteklenen siralamalar. Solr'da fiyat alani YOK (fiyatlar demo olarak arayuzde
+     * uretiliyor), bu yuzden fiyata gore siralama sunulmuyor.
+     */
+    private static void applySort(SolrQuery query, String sort) {
+        if (sort == null || sort.isBlank() || "relevance".equals(sort)) {
+            return; // varsayilan: Solr'un alaka puani (score desc)
+        }
+        switch (sort) {
+            case "name_asc" -> query.addSort("nameSort", SolrQuery.ORDER.asc);
+            case "name_desc" -> query.addSort("nameSort", SolrQuery.ORDER.desc);
+            case "rating_desc" -> query.addSort("ratingValue", SolrQuery.ORDER.desc);
+            case "rating_asc" -> query.addSort("ratingValue", SolrQuery.ORDER.asc);
+            default -> throw new IllegalArgumentException("Gecersiz siralama: " + sort);
+        }
+        // Esit degerlerde sayfalar arasi tutarli sira icin ikincil anahtar
+        query.addSort("hotelCode", SolrQuery.ORDER.asc);
+    }
+
     public HotelSearchResponse search(String q, String country, String city, String rating,
-                                       int page, int size) {
+                                       String sort, int page, int size) {
         SolrQuery query = new SolrQuery();
         query.set("defType", "edismax");
         // Arama TEXT alanlarina yapilir (buyuk/kucuk harf duyarsiz). cityName/countryName
@@ -53,6 +72,8 @@ public class HotelService {
         if (rating != null && !rating.isBlank()) {
             query.addFilterQuery("rating:\"" + rating + "\"");
         }
+
+        applySort(query, sort);
 
         query.setFacet(true);
         query.addFacetField(FACET_FIELDS);
@@ -105,6 +126,8 @@ public class HotelService {
 
         HotelDetailResponse response = modelMapper.map(hotel, HotelDetailResponse.class);
         response.setRating(hotel.getRating() != null ? hotel.getRating().name() : null);
+        // ev sahibi fotoğrafları (open-in-view sayesinde lazy koleksiyon burada yüklenir)
+        response.setPhotos(new ArrayList<>(hotel.getPhotos()));
         return response;
     }
 

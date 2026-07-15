@@ -6,7 +6,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HotelService } from '../../core/services/hotel.service';
 import { SearchDatesService } from '../../core/services/search-dates.service';
-import { FacetValue, HotelSearchParams, HotelSummary } from '../../core/models/hotel.model';
+import {
+  FacetValue,
+  HotelSearchParams,
+  HotelSort,
+  HotelSummary,
+} from '../../core/models/hotel.model';
 import { HotelCard } from '../../shared/components/hotel-card/hotel-card';
 import { FeatureCard } from '../../shared/components/feature-card/feature-card';
 import { Faq } from '../../shared/components/faq/faq';
@@ -88,6 +93,17 @@ export class Home {
   readonly page = signal(0);
   readonly loading = signal(false);
   readonly hasSearched = signal(false);
+  readonly sort = signal<HotelSort>('relevance');
+
+  // NOT: fiyata göre sıralama yok — fiyatlar demo olarak arayüzde üretiliyor,
+  // Solr'da fiyat alanı olmadığı için 5000 otel genelinde sıralanamaz.
+  readonly sortOptions: { value: HotelSort; label: string }[] = [
+    { value: 'relevance', label: 'En İlgili' },
+    { value: 'rating_desc', label: 'Yıldız (yüksek → düşük)' },
+    { value: 'rating_asc', label: 'Yıldız (düşük → yüksek)' },
+    { value: 'name_asc', label: 'İsim (A → Z)' },
+    { value: 'name_desc', label: 'İsim (Z → A)' },
+  ];
 
   private query = '';
   readonly activeFilters = signal<ActiveFilters>({});
@@ -160,6 +176,12 @@ export class Home {
     this.runSearch();
   }
 
+  onSortChange(value: HotelSort): void {
+    this.sort.set(value);
+    this.page.set(0); // sıralama değişince ilk sayfaya dön
+    this.runSearch();
+  }
+
   goToPage(newPage: number): void {
     this.page.set(newPage);
     this.runSearch();
@@ -197,6 +219,7 @@ export class Home {
       country: filters.country,
       city: filters.city,
       rating: filters.rating,
+      sort: this.sort(),
       page: this.page(),
       size: PAGE_SIZE,
     };

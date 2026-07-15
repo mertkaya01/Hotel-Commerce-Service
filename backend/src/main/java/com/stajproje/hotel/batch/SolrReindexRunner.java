@@ -41,11 +41,16 @@ public class SolrReindexRunner implements CommandLineRunner {
         }
 
         long solrCount = fetchSolrCount();
-        if (solrCount == hotelCount) {
+        // Sema yeni bir alan kazandiginda (orn. siralama alanlari) dokuman SAYISI degismez;
+        // bu yuzden eski dokumanlarda alan eksik mi diye ayrica bakariz.
+        long missingSortFields = countMissingSortFields();
+
+        if (solrCount == hotelCount && missingSortFields == 0) {
             return; // senkron: yapacak bir sey yok
         }
 
-        log.info("Solr yeniden indexleniyor (H2={} otel, Solr={} dokuman)...", hotelCount, solrCount);
+        log.info("Solr yeniden indexleniyor (H2={} otel, Solr={} dokuman, siralama alani eksik={})...",
+                hotelCount, solrCount, missingSortFields);
 
         int reindexed = 0;
         for (Hotel hotel : hotelRepository.findAll()) {
@@ -61,6 +66,13 @@ public class SolrReindexRunner implements CommandLineRunner {
 
     private long fetchSolrCount() throws Exception {
         SolrQuery query = new SolrQuery("*:*");
+        query.setRows(0);
+        return solrClient.query(query).getResults().getNumFound();
+    }
+
+    /** Siralama alani (ratingValue) olmayan eski dokumanlarin sayisi. */
+    private long countMissingSortFields() throws Exception {
+        SolrQuery query = new SolrQuery("-ratingValue:[* TO *]");
         query.setRows(0);
         return solrClient.query(query).getResults().getNumFound();
     }

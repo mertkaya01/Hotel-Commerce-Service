@@ -32,6 +32,7 @@ import { ReviewCard } from '../../shared/components/review-card/review-card';
 import { HotelCard } from '../../shared/components/hotel-card/hotel-card';
 import { FeatureCard } from '../../shared/components/feature-card/feature-card';
 import { Faq } from '../../shared/components/faq/faq';
+import { resolveFileUrl } from '../../core/utils/file-url';
 
 interface OverviewItem {
   icon: string;
@@ -104,8 +105,14 @@ export class HotelDetail {
     return room ? room.pricePerNight * this.nights() : 0;
   });
 
-  // ---- görsel / demo veriler (otele sabit) ----
-  readonly gallery = computed(() => hotelGallery(this.hotelCode(), 5));
+  // ---- görsel / demo veriler ----
+  // Ev sahibinin eklediği gerçek fotoğraflar varsa onları, yoksa üretilen görselleri kullan
+  readonly gallery = computed(() => {
+    const real = this.hotel()?.photos;
+    return real && real.length > 0
+      ? real.map((p) => resolveFileUrl(p))
+      : hotelGallery(this.hotelCode(), 5);
+  });
   readonly reviewScore = computed(() => demoReviewScore(this.hotelCode()));
   readonly reviewCount = computed(() => demoReviewCount(this.hotelCode()));
   readonly reviewLabel = computed(() => reviewScoreLabel(this.reviewScore()));

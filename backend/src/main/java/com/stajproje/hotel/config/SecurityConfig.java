@@ -4,8 +4,10 @@ import com.stajproje.hotel.security.CustomUserDetailsService;
 import com.stajproje.hotel.security.JwtAuthFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -67,6 +69,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/hotels/**").permitAll()
+                        // yuklenen otel fotograflari herkese acik (okuma); yukleme /api/uploads
+                        // altinda ve @PreAuthorize ile ev sahibine kisitli
+                        .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
@@ -77,10 +82,15 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // İzin verilen origin'ler env/property ile ayarlanabilir (deploy'da APP_CORS_ORIGINS).
+    // Virgülle ayrılmış liste; varsayılan yerel geliştirme.
+    @Value("${app.cors.origins:http://localhost:4200}")
+    private String corsOrigins;
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+        configuration.setAllowedOrigins(List.of(corsOrigins.split(",")));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

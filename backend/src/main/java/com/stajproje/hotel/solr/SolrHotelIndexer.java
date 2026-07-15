@@ -29,6 +29,9 @@ public class SolrHotelIndexer {
         doc.addField("cityText", hotel.getCityName());
         doc.addField("countryText", hotel.getCountryName());
         doc.addField("rating", hotel.getRating().name());
+        // siralamaya ozel alanlar (bkz. SolrSchemaInitializer)
+        doc.addField("nameSort", hotel.getName());
+        doc.addField("ratingValue", hotel.getRating().getStars());
         doc.addField("address", hotel.getAddress());
         doc.addField("description", hotel.getDescription());
         doc.addField("facilities", hotel.getFacilities());

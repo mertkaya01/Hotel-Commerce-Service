@@ -1,53 +1,97 @@
 <div class="apps-page container">
-  <a routerLink="/host" class="back"><mat-icon inline>arrow_back</mat-icon> Ev Sahibi Paneli</a>
-  <h1 class="section-title">Ev Sahibi Başvuruları</h1>
-  <p class="section-subtitle">Değerlendirilmeyi bekleyen başvurular.</p>
+  <h1 class="section-title">Başvurular</h1>
+  <p class="section-subtitle">Platform yöneticisi olarak ev sahibi ve otel başvurularını buradan onayla.</p>
 
   @if (loading()) {
     <div class="center"><mat-spinner diameter="40"></mat-spinner></div>
-  } @else if (applications().length === 0) {
-    <div class="empty">
-      <mat-icon>inbox</mat-icon>
-      <h3>Bekleyen başvuru yok</h3>
-      <p>Şu an değerlendirilecek yeni bir ev sahibi başvurusu bulunmuyor.</p>
-    </div>
   } @else {
-    <div class="app-list">
-      @for (app of applications(); track app.id) {
-        <div class="app-card">
-          <div class="app-head">
-            <span class="avatar">{{ app.firstName.charAt(0) }}</span>
-            <div class="who">
-              <strong>{{ app.firstName }} {{ app.lastName }}</strong>
-              <span>{{ app.email }}</span>
+    <!-- Ev Sahibi Başvuruları -->
+    <section class="app-section">
+      <h2 class="block-title">
+        <mat-icon inline>person_add</mat-icon> Ev Sahibi Başvuruları
+        <span class="count">{{ applications().length }}</span>
+      </h2>
+
+      @if (applications().length === 0) {
+        <div class="empty">
+          <mat-icon>inbox</mat-icon>
+          <p>Bekleyen ev sahibi başvurusu yok.</p>
+        </div>
+      } @else {
+        <div class="app-list">
+          @for (app of applications(); track app.id) {
+            <div class="app-card">
+              <div class="app-head">
+                <span class="avatar">{{ app.firstName.charAt(0) }}</span>
+                <div class="who">
+                  <strong>{{ app.firstName }} {{ app.lastName }}</strong>
+                  <span>{{ app.email }}</span>
+                </div>
+                <span class="date">{{ app.createdAt | date: 'd MMM yyyy' }}</span>
+              </div>
+
+              <div class="app-meta">
+                <span><mat-icon inline>cake</mat-icon> {{ app.birthDate | date: 'd MMM yyyy' }}</span>
+              </div>
+
+              <p class="app-desc">{{ app.description }}</p>
+
+              <div class="app-actions">
+                <button class="btn-approve" (click)="approve(app)" [disabled]="processingId() === app.id">
+                  <mat-icon inline>check</mat-icon> Onayla
+                </button>
+                <button class="btn-reject" (click)="reject(app)" [disabled]="processingId() === app.id">
+                  <mat-icon inline>close</mat-icon> Reddet
+                </button>
+              </div>
             </div>
-            <span class="date">{{ app.createdAt | date: 'd MMM yyyy' }}</span>
-          </div>
-
-          <div class="app-meta">
-            <span><mat-icon inline>cake</mat-icon> {{ app.birthDate | date: 'd MMM yyyy' }}</span>
-          </div>
-
-          <p class="app-desc">{{ app.description }}</p>
-
-          <div class="app-actions">
-            <button
-              class="btn-approve"
-              (click)="approve(app)"
-              [disabled]="processingId() === app.id"
-            >
-              <mat-icon inline>check</mat-icon> Onayla
-            </button>
-            <button
-              class="btn-reject"
-              (click)="reject(app)"
-              [disabled]="processingId() === app.id"
-            >
-              <mat-icon inline>close</mat-icon> Reddet
-            </button>
-          </div>
+          }
         </div>
       }
-    </div>
+    </section>
+
+    <!-- Otel Başvuruları -->
+    <section class="app-section">
+      <h2 class="block-title">
+        <mat-icon inline>apartment</mat-icon> Otel Başvuruları
+        <span class="count">{{ hotels().length }}</span>
+      </h2>
+
+      @if (hotels().length === 0) {
+        <div class="empty">
+          <mat-icon>inbox</mat-icon>
+          <p>Onay bekleyen otel yok.</p>
+        </div>
+      } @else {
+        <div class="hotel-list">
+          @for (h of hotels(); track h.id) {
+            <div class="hotel-card">
+              <div class="thumb">
+                @if (h.photos.length > 0) {
+                  <img [src]="photoUrl(h.photos[0])" [alt]="h.name" />
+                } @else {
+                  <div class="thumb-fallback"><mat-icon>apartment</mat-icon></div>
+                }
+              </div>
+              <div class="hotel-info">
+                <strong>{{ h.name }}</strong>
+                <span class="loc">{{ h.cityName }}, {{ h.countryName }} · {{ h.roomCount }} oda</span>
+                @if (h.ownerName) {
+                  <span class="owner"><mat-icon inline>person</mat-icon> {{ h.ownerName }}</span>
+                }
+              </div>
+              <div class="app-actions">
+                <button class="btn-approve" (click)="approveHotel(h)" [disabled]="processingHotelId() === h.id">
+                  <mat-icon inline>check</mat-icon> Onayla
+                </button>
+                <button class="btn-reject" (click)="rejectHotel(h)" [disabled]="processingHotelId() === h.id">
+                  <mat-icon inline>close</mat-icon> Reddet
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
   }
 </div>

@@ -1,0 +1,37 @@
+# Render Blueprint — backend + Solr (frontend Vercel'de).
+# Render Dashboard > Blueprints > bu repo ile oluştur. Bazı alanları (SOLR_BASE_URL,
+# APP_CORS_ORIGINS) deploy sonrası dashboard'dan doldurman gerekir — DEPLOY.md'ye bak.
+services:
+  # 1) Apache Solr — arama motoru
+  - type: web
+    name: hotel-solr
+    runtime: image
+    image:
+      url: solr:9.10
+    region: frankfurt
+    plan: free
+    # Solr'u Render'ın verdiği $PORT üzerinde dinlet + hotels core'unu oluştur
+    dockerCommand: bash -c "export SOLR_PORT=$PORT && solr-precreate hotels"
+    envVars:
+      - key: SOLR_HEAP
+        value: 300m
+
+  # 2) Spring Boot backend
+  - type: web
+    name: hotel-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    region: frankfurt
+    plan: free
+    envVars:
+      # 512MB RAM'e sığması için JVM heap sınırı
+      - key: JAVA_TOOL_OPTIONS
+        value: -Xmx350m
+      # Solr servisinin herkese açık adresi — deploy sonrası dashboard'dan gir:
+      # https://hotel-solr-XXXX.onrender.com/solr
+      - key: SOLR_BASE_URL
+        sync: false
+      # Vercel frontend origin'i — örn. https://senin-projen.vercel.app
+      - key: APP_CORS_ORIGINS
+        sync: false
