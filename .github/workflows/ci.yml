@@ -1,12 +1,12 @@
 name: CI
 
-# Her push ve pull request'te backend + frontend derlenir ve testler kosar.
-# Boylece bozuk kod main'e girmeden yakalanir.
+# Bozuk kod main'e girmeden yakalanir.
+# NOT: push'u yalnizca main ile sinirliyoruz; dal push'u zaten PR kontrolunu
+# tetikliyor. Ikisi birden acik olursa her kontrol IKI KEZ kosar (bosuna dakika).
 on:
   push:
-    branches: ['**']
-  pull_request:
     branches: [main]
+  pull_request:
 
 jobs:
   backend:
