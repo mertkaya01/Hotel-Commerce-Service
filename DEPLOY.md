@@ -28,9 +28,12 @@ böylece tarayıcı her şeyi aynı origin'den görür ve CORS derdi olmaz.
 
 ## Bölüm 2 — Frontend (Vercel)
 
-1. `frontend/vercel.json` içindeki `RENDER_BACKEND_URL.onrender.com`'u **kendi backend adresinle** değiştir:
+1. `frontend/vercel.json` içindeki `RENDER_BACKEND_URL.onrender.com`'u **kendi backend adresinle**
+   değiştir. **İKİ yerde geçiyor** (`/api` ve `/uploads` proxy'si) — ikisini de değiştir:
    ```json
    "destination": "https://hotel-backend-cd34.onrender.com/api/$1"
+   ...
+   "destination": "https://hotel-backend-cd34.onrender.com/uploads/$1"
    ```
    Değiştir, commit et, push et.
 2. https://vercel.com → GitHub ile giriş → **Add New → Project** → bu repoyu seç.
@@ -55,6 +58,10 @@ yapıp kaydet.
 - **Veri sıfırlanması:** Ücretsiz planda kalıcı disk yok → backend her yeniden deploy'da H2'yi
   sıfırlar; oteller `hotels_subset.csv`'den yeniden yüklenir, admin yeniden oluşur. Kullanıcı
   kayıtları/eklenen oteller sıfırlanır (demo için sorun değil).
+- **Yüklenen fotoğraflar da kalıcı değil:** Aynı sebeple `./uploads` klasörü her deploy'da silinir.
+  Ev sahibinin yüklediği fotoğraflar kaybolur (kalıcı olması için Render'da disk eklemek ya da
+  S3/Cloudinary gibi bir object storage kullanmak gerekir). Demo galeriden seçilen fotoğraflar
+  Unsplash linki olduğu için etkilenmez.
 - **Bellek:** Solr + Spring Boot 512MB'a sığsın diye heap sınırlıdır (`SOLR_HEAP=300m`,
   `-Xmx350m`). OOM olursa Render'da servise daha yüksek plan (Starter) verebilir ya da
   `hotels_subset.csv`'yi küçültebilirsin.
