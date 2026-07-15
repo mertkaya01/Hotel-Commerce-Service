@@ -10,11 +10,13 @@ services:
       url: solr:9.10
     region: frankfurt
     plan: free
-    # Solr imajinin belgelenmis kullanimi (docker-compose.yml ile ayni): entrypoint
-    # docker-entrypoint.sh bu komutu calistirir ve 'hotels' core'unu olusturur.
-    # NOT: burada 'bash -c "..."' KULLANMA — Render tirnaklari oldugu gibi geciriyor,
-    # bash tum satiri tek komut adi sanip 'command not found' (exit 127) veriyor.
-    dockerCommand: solr-precreate hotels
+    # DIKKAT: Render'in dockerCommand'i imajin CMD'sini degil ENTRYPOINT'ini ezer.
+    # Bu yuzden docker-entrypoint.sh'i ACIKCA cagirmak zorundayiz; o script
+    # 'init-var-solr' ile /var/solr/data'yi olusturur (imajda bu klasor bos gelir).
+    # Sadece 'solr-precreate hotels' yazarsak entrypoint atlanir ve
+    # "cp: cannot create directory '/var/solr/data/hotels'" ile patlar.
+    # Ayrica 'bash -c "..."' da KULLANMA — Render tirnaklari oldugu gibi geciriyor.
+    dockerCommand: docker-entrypoint.sh solr-precreate hotels
     envVars:
       # Solr, Render'in bekledigi portu dinlesin (Render'in varsayilan PORT'u 10000).
       # Solr varsayilan 8983'te acilirsa Render servisi "canli" goremez.
