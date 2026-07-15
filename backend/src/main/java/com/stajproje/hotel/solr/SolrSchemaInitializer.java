@@ -1,6 +1,5 @@
 package com.stajproje.hotel.solr;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.solr.client.solrj.impl.HttpJdkSolrClient;
@@ -53,8 +52,13 @@ public class SolrSchemaInitializer {
      * tetikler (searcher kapanir/acilir). Alanlari tek tek eklemek ilk acilista
      * 14 ard arda reload demekti; bu, kucuk bellekli bir Solr'u zorluyor.
      * MultiUpdate ile tek reload yeter.
+     *
+     * NOT: Bu metot artik @PostConstruct DEGIL. Onceden acilista calisiyordu ve
+     * Solr uykudaysa/erisilemezse istisna firlatip UYGULAMANIN ACILMASINI
+     * ENGELLIYORDU (deploy'da backend, Solr uyanana kadar cokup duruyordu).
+     * Artik SolrMaintenanceService cagiriyor: hem acilista hem periyodik olarak,
+     * hata durumunda uygulamayi cokertmeden.
      */
-    @PostConstruct
     public void ensureSchema() throws Exception {
         Set<String> existingFields = fetchExistingFieldNames();
 
