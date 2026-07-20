@@ -46,11 +46,26 @@
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Şifre</mat-label>
           <input matInput type="password" formControlName="password" autocomplete="new-password" />
+          <mat-hint>En az 8 karakter, bir harf ve bir rakam içermeli</mat-hint>
           @if (form.controls.password.hasError('required') && form.controls.password.touched) {
             <mat-error>Şifre boş olamaz</mat-error>
           }
           @if (form.controls.password.hasError('minlength') && form.controls.password.touched) {
             <mat-error>Şifre en az 8 karakter olmalı</mat-error>
+          }
+          @if (form.controls.password.hasError('pattern') && !form.controls.password.hasError('minlength') && form.controls.password.touched) {
+            <mat-error>Şifre en az bir harf ve bir rakam içermeli</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Şifre Tekrar</mat-label>
+          <input matInput type="password" formControlName="confirmPassword" autocomplete="new-password" />
+          @if (form.controls.confirmPassword.hasError('required') && form.controls.confirmPassword.touched) {
+            <mat-error>Şifreyi tekrar giriniz</mat-error>
+          }
+          @if (form.controls.confirmPassword.hasError('passwordMismatch') && form.controls.confirmPassword.touched) {
+            <mat-error>Şifreler eşleşmiyor</mat-error>
           }
         </mat-form-field>
 

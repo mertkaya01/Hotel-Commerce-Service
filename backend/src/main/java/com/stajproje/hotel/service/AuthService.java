@@ -25,15 +25,20 @@ public class AuthService {
     private final JwtService jwtService;
 
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new EmailAlreadyExistsException(request.getEmail());
+        // E-postayi normalize et: "Test@X.com " ve "test@x.com" ayni hesap olmali.
+        // (existsByEmail buyuk/kucuk harf duyarli oldugu icin normalize etmezsek
+        // ayni e-postayla farkli case'lerde mukerrer hesap acilabilir.)
+        String email = normalizeEmail(request.getEmail());
+
+        if (userRepository.existsByEmail(email)) {
+            throw new EmailAlreadyExistsException(email);
         }
 
         User user = User.builder()
-                .email(request.getEmail())
+                .email(email)
                 .password(passwordEncoder.encode(request.getPassword()))
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
+                .firstName(request.getFirstName().trim())
+                .lastName(request.getLastName().trim())
                 .role(Role.USER)
                 .build();
 
@@ -44,14 +49,21 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        // Girisde de normalize et ki kayittaki normalize edilmis e-postayla eslessin.
+        String email = normalizeEmail(request.getEmail());
 
-        User user = userRepository.findByEmail(request.getEmail())
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, request.getPassword()));
+
+        User user = userRepository.findByEmail(email)
                 .orElseThrow();
 
         String token = jwtService.generateToken(new UserPrincipal(user));
         return buildAuthResponse(user, token);
+    }
+
+    private String normalizeEmail(String email) {
+        return email == null ? null : email.trim().toLowerCase(java.util.Locale.ROOT);
     }
 
     private AuthResponse buildAuthResponse(User user, String token) {

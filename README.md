@@ -8,11 +8,12 @@ Gerçek bir otel veri seti (1M+ satır) üzerine kurulu, **tam yığın (full-st
 
 ## ✨ Neler var?
 
-- **Otel arama** — 5000+ otel içinde full-text arama, ülke/şehir/yıldız filtreleri, facet sayıları, sıralama ve sayfalama
+- **Otel arama** — 5000+ otel içinde full-text arama, ülke/şehir/yıldız + **fiyat aralığı** filtreleri, facet sayıları, sıralama ve sayfalama
 - **Rezervasyon** — oda + tarih seçimi, çakışma kontrolü, iptal
 - **Favoriler** — kullanıcıya özel
 - **Ev sahipliği** — başvur, onaylanınca otelini ekle (fotoğraf yükleme + olanaklar + odalar)
 - **Onay sistemi** — otel yalnızca platform yöneticisi onayladıktan sonra aramaya girer
+- **Güvenli kayıt/giriş** — BCrypt + stateless JWT, e-posta normalizasyonu, şifre gücü kuralı, rol bazlı yetki
 - **Roller** — `USER` (misafir) · `ADMIN` (ev sahibi) · `SUPER_ADMIN` (platform yöneticisi)
 
 ---
@@ -142,6 +143,8 @@ Bu projeyi sıradan bir CRUD demosundan ayıran, bilinçli mühendislik kararlar
 - **Sıralama için ayrı Solr alanları.** `name` text_general olduğu için sıralanamaz, `rating` ise string olduğundan alfabetik sıralanır (FIVE < FOUR < ONE — yanlış). Bu yüzden `nameSort` (string) ve `ratingValue` (pint) alanları eklendi. Eşit değerlerde sayfalar arası tutarlılık için ikincil anahtar `hotelCode`.
 - **Şema değişince kendini onaran reindex.** Solr'a yeni alan eklendiğinde doküman *sayısı* değişmediği için eski "sayıları karşılaştır" kontrolü yetmez; `SolrReindexRunner` artık alanı eksik doküman var mı diye de bakar ve gerekirse yeniden indexler.
 - **Yükleme güvenliği.** Fotoğraf yüklemede kullanıcının verdiği dosya adı **asla** diske yazılmaz (UUID üretilir — path traversal ve üzerine yazma engellenir); content-type *ve* uzantı ayrı ayrı doğrulanır (content-type taklit edilebilir).
+- **Tutarlı fiyat (tek kaynak).** Otelin **en ucuz oda fiyatı** (`Hotel.minPrice`) H2'de saklanıp Solr'a indexlenir; arama kartındaki fiyat = fiyat filtresi = detaydaki en ucuz oda = rezervasyon fiyatı. Fiyat aralığı filtresi Solr range sorgusuyla (`minPrice:[a TO b]`) yapılır — client-side filtre olsaydı sayfalama/facet bozulurdu. Fiyatlar demo (import'ta üretilmiş) ama içsel tutarlı.
+- **Güvenlik sertleştirme.** E-posta normalize edilir (`toLowerCase().trim()`) — `Test@x.com` ile `test@x.com` mükerrer hesap açamaz. Şifre kuralı: en az 8 karakter + harf + rakam (`@Pattern`, hem backend hem frontend). JWT secret repoda değil, `JWT_SECRET` env'inden okunur. Kullanıcı sızdırma yok: hatalı giriş "Email veya sifre hatali" der.
 
 > **Not (demo veri):** Veri setinde otel fotoğrafı, kullanıcı yorumu veya fiyat yok. Kart görselleri örnek (Unsplash) fotoğraflar; yorum sayısı/puanı ve gecelik fiyat, otel koduna göre deterministik üretilen demo değerlerdir. Bu yüzden **fiyata göre sıralama yoktur** — fiyat Solr'da bir alan olmadığı için 5000 otel genelinde sıralanamaz (yalnızca ev sahibinin eklediği otellerin gerçek oda fiyatı vardır).
 
@@ -155,7 +158,7 @@ Tam ve interaktif liste: **Swagger UI** (`/swagger-ui/index.html`).
 |---|---|---|---|
 | POST | `/api/auth/register` | Kayıt | ✗ |
 | POST | `/api/auth/login` | Giriş (JWT döner) | ✗ |
-| GET | `/api/hotels/search` | Arama + facet (q, country, city, rating, **sort**, page, size) | ✗ |
+| GET | `/api/hotels/search` | Arama + facet (q, country, city, rating, **minPrice, maxPrice**, sort, page, size) | ✗ |
 | GET | `/api/hotels/{hotelCode}` | Otel detayı | ✗ |
 | GET | `/api/hotels/{hotelCode}/rooms` | Oda listesi | ✗ |
 | POST | `/api/reservations` | Rezervasyon oluştur | ✓ |
@@ -178,8 +181,8 @@ Tam ve interaktif liste: **Swagger UI** (`/swagger-ui/index.html`).
 ## 🧪 Test
 
 ```bash
-cd backend && ./mvnw test          # 29 test (JUnit 5 + Mockito + AssertJ)
-cd frontend && npx ng test --watch=false   # 17 test (Vitest)
+cd backend && ./mvnw test          # 35 test (JUnit 5 + Mockito + AssertJ)
+cd frontend && npx ng test --watch=false   # 22 test (Vitest)
 ```
 
 Testler dış altyapıya (Solr) bağımlı **değildir** — `test` profilinde in-memory H2 kullanılır, arama/import bileşenleri `@Profile("!test")` ile devre dışı bırakılır. Bu sayede CI'da Solr servisi çalıştırmaya gerek kalmaz.

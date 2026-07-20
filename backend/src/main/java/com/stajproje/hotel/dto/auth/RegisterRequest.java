@@ -2,6 +2,7 @@ package com.stajproje.hotel.dto.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +17,11 @@ public class RegisterRequest {
 
     @NotBlank(message = "Sifre bos olamaz")
     @Size(min = 8, message = "Sifre en az 8 karakter olmali")
+    // En az bir harf ve bir rakam iceren, bosluksuz sifre (temel guclendirme)
+    @Pattern(
+            regexp = "^(?=.*[A-Za-z])(?=.*\\d)\\S{8,}$",
+            message = "Sifre en az bir harf ve bir rakam icermeli"
+    )
     private String password;
 
     @NotBlank(message = "Ad bos olamaz")

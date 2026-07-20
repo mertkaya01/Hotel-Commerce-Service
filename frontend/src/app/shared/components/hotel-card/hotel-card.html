@@ -49,8 +49,13 @@
 
     <div class="card-footer">
       <div class="price">
-        <span class="price-label">Gecelik</span>
-        <strong>{{ price() | number }} ₺</strong>
+        @if (price() != null) {
+          <span class="price-label">Gecelik başlangıç</span>
+          <strong>{{ price() | number: '1.0-0' }} ₺</strong>
+        } @else {
+          <span class="price-label">Fiyat</span>
+          <strong>—</strong>
+        }
       </div>
       <a [routerLink]="['/hotels', hotel().hotelCode]" class="go-btn">Otele Git</a>
     </div>

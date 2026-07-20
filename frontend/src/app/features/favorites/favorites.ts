@@ -47,6 +47,7 @@ export class Favorites {
             countryName: h.countryName,
             cityName: h.cityName,
             rating: h.rating,
+            minPrice: h.minPrice,
           }),
         ),
         catchError(() => of(null)),
