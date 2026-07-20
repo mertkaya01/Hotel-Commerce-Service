@@ -6,7 +6,6 @@ import com.stajproje.hotel.entity.Room;
 import com.stajproje.hotel.entity.RoomType;
 import com.stajproje.hotel.repository.HotelRepository;
 import com.stajproje.hotel.repository.RoomRepository;
-import com.stajproje.hotel.solr.SolrHotelIndexer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
@@ -37,23 +36,24 @@ public class CsvImportRunner implements CommandLineRunner {
 
     private final HotelRepository hotelRepository;
     private final RoomRepository roomRepository;
-    private final SolrHotelIndexer solrIndexer;
-    private final com.stajproje.hotel.solr.SolrSchemaInitializer schemaInitializer;
 
     @Value("${app.import.csv-path}")
     private String csvPath;
 
     private static final Random RANDOM = new Random();
 
-    /** Kac oteli tek Solr istegiyle gonderecegimiz. */
-    private static final int SOLR_BATCH_SIZE = 500;
-
+    /**
+     * SADECE H2'yi (kalici kaynak) doldurur. Solr'a DOKUNMAZ.
+     *
+     * NEDEN: Solr indexleme + sema kurulumu, Solr'a ulasilamiyorsa (orn. deploy'da
+     * Solr uykudaysa) istisna firlatir; bir CommandLineRunner istisnasi ise TUM
+     * uygulamanin acilmasini engeller (crash loop). Bu yuzden Solr'u burada degil,
+     * @Order(2) SolrReindexRunner -> SolrMaintenanceService.ensureSolrInSync icinde
+     * yapiyoruz; orasi try/catch ile sarili, Solr yoksa cokmez ve SolrSelfHealTask
+     * Solr uyaninca otomatik indexler. Sema da orada, indexlemeden ONCE kurulur.
+     */
     @Override
     public void run(String... args) throws Exception {
-        // Indexlemeden ONCE semayi kur: aksi halde Solr schemaless modda alan
-        // tiplerini (orn. minPrice) yanlis tahmin eder (coklu-deger pdoubles).
-        schemaInitializer.ensureSchema();
-
         if (hotelRepository.count() > 0) {
             log.info("Hotel verisi zaten yuklu, CSV import atlaniyor.");
             return;
@@ -63,8 +63,6 @@ public class CsvImportRunner implements CommandLineRunner {
         int imported = 0;
         int duplicateSkipped = 0;
         Set<String> seenHotelCodes = new HashSet<>();
-        // Solr'a tek tek degil toplu gonderiyoruz (bkz. SolrHotelIndexer.indexAll)
-        List<Hotel> solrBatch = new ArrayList<>(SOLR_BATCH_SIZE);
 
         try (var inputStream = new ClassPathResource(csvPath).getInputStream();
              var reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
@@ -94,21 +92,14 @@ public class CsvImportRunner implements CommandLineRunner {
                 roomRepository.saveAll(rooms);
                 imported++;
 
-                solrBatch.add(hotel);
-                if (solrBatch.size() >= SOLR_BATCH_SIZE) {
-                    solrIndexer.indexAll(solrBatch);
-                    solrBatch.clear();
+                if (imported % 500 == 0) {
                     log.info("{} otel import edildi...", imported);
                 }
             }
         }
 
-        // son (tam dolmamis) parti
-        solrIndexer.indexAll(solrBatch);
-        solrBatch.clear();
-
-        solrIndexer.commit();
-        log.info("CSV import tamamlandi. Toplam {} otel yuklendi, {} duplicate hotelCode atlandi.", imported, duplicateSkipped);
+        log.info("CSV import tamamlandi. Toplam {} otel yuklendi, {} duplicate hotelCode atlandi. "
+                + "Solr indexleme SolrReindexRunner'a birakildi.", imported, duplicateSkipped);
     }
 
     private Hotel toHotel(CSVRecord record) {
