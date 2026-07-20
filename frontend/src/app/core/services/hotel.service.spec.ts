@@ -66,6 +66,24 @@ describe('HotelService', () => {
     req.flush({ hotels: [], totalResults: 0, page: 0, size: 12, facets: {} });
   });
 
+  it('fiyat araligi verilince minPrice/maxPrice parametrelerini gonderir', () => {
+    service.search({ minPrice: 100, maxPrice: 300 }).subscribe();
+
+    const req = httpMock.expectOne((r) => r.url === searchUrl);
+    expect(req.request.params.get('minPrice')).toBe('100');
+    expect(req.request.params.get('maxPrice')).toBe('300');
+    req.flush({ hotels: [], totalResults: 0, page: 0, size: 12, facets: {} });
+  });
+
+  it('fiyat verilmezse minPrice/maxPrice parametresi GONDERMEZ', () => {
+    service.search({}).subscribe();
+
+    const req = httpMock.expectOne((r) => r.url === searchUrl);
+    expect(req.request.params.has('minPrice')).toBe(false);
+    expect(req.request.params.has('maxPrice')).toBe(false);
+    req.flush({ hotels: [], totalResults: 0, page: 0, size: 12, facets: {} });
+  });
+
   it('otel detayini hotelCode ile ister', () => {
     service.getByHotelCode('HOST-ABC123').subscribe();
 

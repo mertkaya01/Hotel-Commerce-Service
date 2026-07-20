@@ -57,6 +57,10 @@ public class SolrHotelIndexer {
         // siralamaya ozel alanlar (bkz. SolrSchemaInitializer)
         doc.addField("nameSort", hotel.getName());
         doc.addField("ratingValue", hotel.getRating().getStars());
+        // en ucuz oda fiyati — fiyat filtresi (range) ve kartta gosterim icin
+        if (hotel.getMinPrice() != null) {
+            doc.addField("minPrice", hotel.getMinPrice().doubleValue());
+        }
         doc.addField("address", hotel.getAddress());
         doc.addField("description", hotel.getDescription());
         doc.addField("facilities", hotel.getFacilities());

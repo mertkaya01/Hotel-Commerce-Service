@@ -38,6 +38,7 @@ public class CsvImportRunner implements CommandLineRunner {
     private final HotelRepository hotelRepository;
     private final RoomRepository roomRepository;
     private final SolrHotelIndexer solrIndexer;
+    private final com.stajproje.hotel.solr.SolrSchemaInitializer schemaInitializer;
 
     @Value("${app.import.csv-path}")
     private String csvPath;
@@ -49,6 +50,10 @@ public class CsvImportRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        // Indexlemeden ONCE semayi kur: aksi halde Solr schemaless modda alan
+        // tiplerini (orn. minPrice) yanlis tahmin eder (coklu-deger pdoubles).
+        schemaInitializer.ensureSchema();
+
         if (hotelRepository.count() > 0) {
             log.info("Hotel verisi zaten yuklu, CSV import atlaniyor.");
             return;
@@ -81,8 +86,11 @@ public class CsvImportRunner implements CommandLineRunner {
                     continue;
                 }
 
-                hotelRepository.save(hotel);
+                // Odalari once uret ki en ucuz fiyati otele yazabilelim (arama
+                // kartinda gosterilir + fiyat filtresinde kullanilir).
                 List<Room> rooms = generateRooms(hotel);
+                hotel.setMinPrice(minRoomPrice(rooms));
+                hotelRepository.save(hotel);
                 roomRepository.saveAll(rooms);
                 imported++;
 
@@ -145,6 +153,14 @@ public class CsvImportRunner implements CommandLineRunner {
                     .build());
         }
         return rooms;
+    }
+
+    /** Odalarin en dusuk gecelik fiyati (bos liste gelmez ama guvenli). */
+    private BigDecimal minRoomPrice(List<Room> rooms) {
+        return rooms.stream()
+                .map(Room::getPricePerNight)
+                .min(BigDecimal::compareTo)
+                .orElse(null);
     }
 
     private int capacityFor(RoomType type) {

@@ -4,6 +4,7 @@ export interface HotelSummary {
   countryName: string;
   cityName: string;
   rating: string;
+  minPrice: number | null; // en ucuz oda gecelik fiyati
 }
 
 export interface FacetValue {
@@ -26,6 +27,7 @@ export interface HotelDetail {
   countryName: string;
   cityName: string;
   rating: string;
+  minPrice: number | null;
   address: string | null;
   description: string | null;
   facilities: string | null;
@@ -52,6 +54,8 @@ export interface HotelSearchParams {
   country?: string;
   city?: string;
   rating?: string;
+  minPrice?: number;
+  maxPrice?: number;
   sort?: HotelSort;
   page?: number;
   size?: number;

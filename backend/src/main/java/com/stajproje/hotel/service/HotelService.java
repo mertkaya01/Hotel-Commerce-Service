@@ -18,6 +18,7 @@ import org.apache.solr.common.SolrDocument;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,7 +54,19 @@ public class HotelService {
         query.addSort("hotelCode", SolrQuery.ORDER.asc);
     }
 
+    /** Fiyat aralik filtresi: minPrice alanina Solr range sorgusu ekler. */
+    private static void applyPriceFilter(SolrQuery query, Double minPrice, Double maxPrice) {
+        if (minPrice == null && maxPrice == null) {
+            return;
+        }
+        if (minPrice != null && minPrice < 0) minPrice = 0.0;
+        String lower = minPrice != null ? String.valueOf(minPrice) : "*";
+        String upper = maxPrice != null ? String.valueOf(maxPrice) : "*";
+        query.addFilterQuery("minPrice:[" + lower + " TO " + upper + "]");
+    }
+
     public HotelSearchResponse search(String q, String country, String city, String rating,
+                                       Double minPrice, Double maxPrice,
                                        String sort, int page, int size) {
         SolrQuery query = new SolrQuery();
         query.set("defType", "edismax");
@@ -73,6 +86,7 @@ public class HotelService {
             query.addFilterQuery("rating:\"" + rating + "\"");
         }
 
+        applyPriceFilter(query, minPrice, maxPrice);
         applySort(query, sort);
 
         query.setFacet(true);
@@ -88,12 +102,19 @@ public class HotelService {
 
             List<HotelSummary> hotels = new ArrayList<>();
             for (SolrDocument doc : response.getResults()) {
+                // minPrice tek deger; ama Solr schemaless bazi ortamlarda alani
+                // coklu-deger (pdoubles) olusturabiliyor -> liste gelirse ilk elemani al.
+                Object priceVal = doc.getFieldValue("minPrice");
+                if (priceVal instanceof java.util.Collection<?> c) {
+                    priceVal = c.isEmpty() ? null : c.iterator().next();
+                }
                 hotels.add(HotelSummary.builder()
                         .hotelCode((String) doc.getFieldValue("hotelCode"))
                         .name((String) doc.getFieldValue("name"))
                         .countryName((String) doc.getFieldValue("countryName"))
                         .cityName((String) doc.getFieldValue("cityName"))
                         .rating((String) doc.getFieldValue("rating"))
+                        .minPrice(priceVal != null ? BigDecimal.valueOf(((Number) priceVal).doubleValue()) : null)
                         .build());
             }
 

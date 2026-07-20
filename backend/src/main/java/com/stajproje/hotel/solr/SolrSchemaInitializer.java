@@ -37,6 +37,8 @@ public class SolrSchemaInitializer {
             // string oldugundan alfabetik (yanlis) siralanir. Bu ikisi siralamaya ozel.
             field("nameSort", "string", true),
             field("ratingValue", "pint", true),
+            // en ucuz oda fiyati — range sorgusu (fiyat filtresi) icin sayisal
+            field("minPrice", "pdouble", true),
             field("address", "text_general", true),
             field("description", "text_general", true),
             field("facilities", "text_general", true),

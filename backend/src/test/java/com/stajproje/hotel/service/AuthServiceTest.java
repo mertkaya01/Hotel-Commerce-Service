@@ -54,6 +54,29 @@ class AuthServiceTest {
     }
 
     @Test
+    void register_shouldNormalizeEmail_beforeCheckAndSave() {
+        // Kullanici "  Mert@Example.COM " girse bile normalize edilip saklanmali,
+        // boylece farkli case ile mukerrer hesap acilamaz.
+        RegisterRequest req = registerRequest();
+        req.setEmail("  Mert@Example.COM ");
+
+        when(userRepository.existsByEmail("mert@example.com")).thenReturn(false);
+        when(passwordEncoder.encode(any())).thenReturn("HASHED_PW");
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(jwtService.generateToken(any(UserDetails.class))).thenReturn("jwt-token");
+
+        AuthResponse response = authService.register(req);
+
+        // mukerrer kontrolu normalize edilmis e-posta ile yapilmali
+        verify(userRepository).existsByEmail("mert@example.com");
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(captor.capture());
+        assertThat(captor.getValue().getEmail()).isEqualTo("mert@example.com");
+        assertThat(response.getEmail()).isEqualTo("mert@example.com");
+    }
+
+    @Test
     void register_shouldHashPasswordAndAssignUserRole() {
         when(userRepository.existsByEmail(any())).thenReturn(false);
         when(passwordEncoder.encode("sifre1234")).thenReturn("HASHED_PW");

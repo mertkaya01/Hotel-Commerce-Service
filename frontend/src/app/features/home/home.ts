@@ -105,6 +105,16 @@ export class Home {
     { value: 'name_desc', label: 'İsim (Z → A)' },
   ];
 
+  // Fiyat aralığı filtresi (otelin en ucuz oda gecelik fiyatına göre)
+  readonly priceMin = signal<number | null>(null);
+  readonly priceMax = signal<number | null>(null);
+  readonly pricePresets: { label: string; min: number | null; max: number | null }[] = [
+    { label: '0 – 100 ₺', min: 0, max: 100 },
+    { label: '100 – 200 ₺', min: 100, max: 200 },
+    { label: '200 – 300 ₺', min: 200, max: 300 },
+    { label: '300 ₺ +', min: 300, max: null },
+  ];
+
   private query = '';
   readonly activeFilters = signal<ActiveFilters>({});
 
@@ -155,9 +165,49 @@ export class Home {
     // seçilen tarih aralığını sakla -> otel detayındaki booking kutusuna taşınır
     this.searchDates.set(this.checkIn.value, this.checkOut.value);
     this.activeFilters.set({});
+    this.priceMin.set(null);
+    this.priceMax.set(null);
     this.page.set(0);
     this.hasSearched.set(true);
     this.runSearch();
+  }
+
+  applyPricePreset(min: number | null, max: number | null): void {
+    this.priceMin.set(min);
+    this.priceMax.set(max);
+    this.page.set(0);
+    this.runSearch();
+  }
+
+  applyPriceInputs(minRaw: string, maxRaw: string): void {
+    const min = minRaw !== '' ? Math.max(0, Number(minRaw)) : null;
+    const max = maxRaw !== '' ? Math.max(0, Number(maxRaw)) : null;
+    // geçersiz aralık (min > max) ise sessizce yok say
+    if (min != null && max != null && min > max) return;
+    this.priceMin.set(Number.isFinite(min as number) ? min : null);
+    this.priceMax.set(Number.isFinite(max as number) ? max : null);
+    this.page.set(0);
+    this.runSearch();
+  }
+
+  clearPriceFilter(): void {
+    this.priceMin.set(null);
+    this.priceMax.set(null);
+    this.page.set(0);
+    this.runSearch();
+  }
+
+  get hasPriceFilter(): boolean {
+    return this.priceMin() != null || this.priceMax() != null;
+  }
+
+  get priceFilterLabel(): string {
+    const lo = this.priceMin();
+    const hi = this.priceMax();
+    if (lo != null && hi != null) return `${lo} – ${hi} ₺`;
+    if (lo != null) return `${lo} ₺ +`;
+    if (hi != null) return `0 – ${hi} ₺`;
+    return '';
   }
 
   applyFilter(type: keyof ActiveFilters, value: string): void {
@@ -219,6 +269,8 @@ export class Home {
       country: filters.country,
       city: filters.city,
       rating: filters.rating,
+      minPrice: this.priceMin() ?? undefined,
+      maxPrice: this.priceMax() ?? undefined,
       sort: this.sort(),
       page: this.page(),
       size: PAGE_SIZE,

@@ -52,14 +52,14 @@ public class SolrMaintenanceService {
             schemaInitializer.ensureSchema();
 
             long solrCount = fetchSolrCount();
-            long missingSortFields = countMissingSortFields();
+            long missingFields = countMissingIndexedFields();
 
-            if (solrCount == hotelCount && missingSortFields == 0) {
+            if (solrCount == hotelCount && missingFields == 0) {
                 return false; // senkron
             }
 
-            log.warn("Solr senkron degil (H2={}, Solr={}, siralama alani eksik={}). Yeniden indexleniyor...",
-                    hotelCount, solrCount, missingSortFields);
+            log.warn("Solr senkron degil (H2={}, Solr={}, yeni alani eksik dokuman={}). Yeniden indexleniyor...",
+                    hotelCount, solrCount, missingFields);
             reindexAll();
             return true;
 
@@ -95,9 +95,15 @@ public class SolrMaintenanceService {
         return solrClient.query(query).getResults().getNumFound();
     }
 
-    /** Siralama alani (ratingValue) olmayan eski dokumanlarin sayisi. */
-    private long countMissingSortFields() throws Exception {
-        SolrQuery query = new SolrQuery("-ratingValue:[* TO *]");
+    /**
+     * Sonradan eklenen indexli alanlardan (ratingValue, minPrice) BIRI eksik olan
+     * dokuman sayisi. Sema yeni alan kazandiginda dokuman SAYISI degismedigi icin
+     * bu kontrol, eski dokumanlarin yeniden indexlenmesi gerektigini yakalar.
+     * (minPrice teorik olarak odasiz otelde bos olabilir ama pratikte her otelin
+     * odasi var; yine de eksik cikan varsa reindex zararsiz.)
+     */
+    private long countMissingIndexedFields() throws Exception {
+        SolrQuery query = new SolrQuery("-ratingValue:[* TO *] OR -minPrice:[* TO *]");
         query.setRows(0);
         return solrClient.query(query).getResults().getNumFound();
     }

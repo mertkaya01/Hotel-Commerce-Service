@@ -6,7 +6,6 @@ import { HotelSummary } from '../../../core/models/hotel.model';
 import { FavoritesService } from '../../../core/services/favorites.service';
 import { StarRating } from '../star-rating/star-rating';
 import {
-  demoNightlyPrice,
   demoReviewCount,
   demoReviewScore,
   demoTags,
@@ -26,7 +25,8 @@ export class HotelCard {
   readonly favorites = inject(FavoritesService);
 
   readonly photo = computed(() => hotelPhoto(this.hotel().hotelCode));
-  readonly price = computed(() => demoNightlyPrice(this.hotel().hotelCode, this.hotel().rating));
+  // Gercek en ucuz oda fiyati (backend'den). Kart = detay = rezervasyon tutarli.
+  readonly price = computed(() => this.hotel().minPrice);
   readonly reviewCount = computed(() => demoReviewCount(this.hotel().hotelCode));
   readonly reviewScore = computed(() => demoReviewScore(this.hotel().hotelCode));
   readonly reviewLabel = computed(() => reviewScoreLabel(this.reviewScore()));

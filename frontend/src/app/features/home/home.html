@@ -51,7 +51,7 @@
       <aside class="facets">
         <h3>Filtreler</h3>
 
-        @if (activeFilterEntries().length > 0) {
+        @if (activeFilterEntries().length > 0 || hasPriceFilter) {
           <mat-chip-set class="active-chips">
             @for (entry of activeFilterEntries(); track entry.type) {
               <mat-chip (removed)="removeFilter(entry.type)">
@@ -59,8 +59,39 @@
                 <button matChipRemove aria-label="Kaldır"><mat-icon>cancel</mat-icon></button>
               </mat-chip>
             }
+            @if (hasPriceFilter) {
+              <mat-chip (removed)="clearPriceFilter()">
+                {{ priceFilterLabel }}
+                <button matChipRemove aria-label="Kaldır"><mat-icon>cancel</mat-icon></button>
+              </mat-chip>
+            }
           </mat-chip-set>
         }
+
+        <!-- Fiyat aralığı -->
+        <div class="facet-group price-filter">
+          <h4>Fiyat (gecelik)</h4>
+          <div class="price-presets">
+            @for (p of pricePresets; track p.label) {
+              <button
+                type="button"
+                class="price-preset"
+                [class.active]="priceMin() === p.min && priceMax() === p.max"
+                (click)="applyPricePreset(p.min, p.max)"
+              >
+                {{ p.label }}
+              </button>
+            }
+          </div>
+          <div class="price-inputs">
+            <input #pmin type="number" min="0" placeholder="En az" [value]="priceMin() ?? ''" />
+            <span class="dash">–</span>
+            <input #pmax type="number" min="0" placeholder="En çok" [value]="priceMax() ?? ''" />
+            <button type="button" class="price-apply" (click)="applyPriceInputs(pmin.value, pmax.value)">
+              Uygula
+            </button>
+          </div>
+        </div>
 
         @for (group of facetKeys(); track group.key) {
           @if (facets()[group.key]?.length) {

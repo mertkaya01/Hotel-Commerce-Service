@@ -26,11 +26,14 @@ public class HotelController {
             @RequestParam(required = false) String country,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String rating,
+            // fiyat araligi (otelin en ucuz oda gecelik fiyatina gore)
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
             // relevance (varsayilan) | name_asc | name_desc | rating_desc | rating_asc
             @RequestParam(required = false) String sort,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return hotelService.search(q, country, city, rating, sort, page, size);
+        return hotelService.search(q, country, city, rating, minPrice, maxPrice, sort, page, size);
     }
 
     @GetMapping("/{hotelCode}")

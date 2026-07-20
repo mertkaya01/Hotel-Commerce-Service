@@ -53,6 +53,8 @@ public class HotelListingService {
                 // olanak anahtarlarını facilities metnine çevir (parseAmenities bunu okur)
                 .facilities(request.getAmenities() == null ? null : String.join(" ", request.getAmenities()))
                 .photos(new ArrayList<>(request.getPhotos()))
+                // en ucuz oda fiyati — arama kartinda + fiyat filtresinde kullanilir
+                .minPrice(minRoomPrice(request.getRooms()))
                 .owner(owner)
                 .status(HotelStatus.PENDING)
                 .build();
@@ -131,6 +133,15 @@ public class HotelListingService {
                 .photos(h.getPhotos())
                 .roomCount(roomCount)
                 .build();
+    }
+
+    /** Istenen odalarin en dusuk gecelik fiyati (rooms @NotEmpty oldugu icin bos gelmez). */
+    private java.math.BigDecimal minRoomPrice(List<RoomInput> rooms) {
+        return rooms.stream()
+                .map(RoomInput::getPricePerNight)
+                .filter(java.util.Objects::nonNull)
+                .min(java.math.BigDecimal::compareTo)
+                .orElse(null);
     }
 
     private HotelRating parseRating(String raw) {

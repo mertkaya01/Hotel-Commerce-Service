@@ -105,6 +105,26 @@ class HotelListingServiceTest {
     }
 
     @Test
+    void submit_shouldSetMinPrice_toCheapestRoom() {
+        when(userRepository.findById(7L)).thenReturn(Optional.of(owner));
+        when(hotelRepository.save(any(Hotel.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        // request() tek oda (500) donuyor; ikinci daha ucuz oda ekleyelim
+        HotelListingRequest req = request();
+        RoomInput cheap = new RoomInput();
+        cheap.setRoomType("SINGLE");
+        cheap.setCapacity(1);
+        cheap.setPricePerNight(new BigDecimal("250"));
+        req.setRooms(List.of(req.getRooms().get(0), cheap));
+
+        listingService.submit(7L, req);
+
+        // en ucuz oda (250) otelin minPrice'i olmali
+        verify(hotelRepository).save(org.mockito.ArgumentMatchers.argThat(
+                h -> h.getMinPrice() != null && h.getMinPrice().compareTo(new BigDecimal("250")) == 0));
+    }
+
+    @Test
     void submit_shouldMapAmenitiesToFacilitiesText() {
         when(userRepository.findById(7L)).thenReturn(Optional.of(owner));
         when(hotelRepository.save(any(Hotel.class))).thenAnswer(inv -> inv.getArgument(0));

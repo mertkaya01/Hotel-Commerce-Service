@@ -73,6 +73,12 @@ public class Hotel {
 
     private String websiteUrl;
 
+    // Otelin en ucuz oda gecelik fiyati. Arama kartinda gosterilir ve fiyat
+    // filtresinde kullanilir. Import/otel-ekleme aninda odalardan hesaplanip
+    // saklanir (index aninda tekrar oda sorgusu yapmamak icin). CSV importlarinda
+    // ve ev sahibi otellerinde dolar; teorik olarak odasiz otelde null olabilir.
+    private java.math.BigDecimal minPrice;
+
     // Yayın durumu: CSV importları ve onaylananlar APPROVED (aramada görünür),
     // ev sahibinin eklediği yeni oteller onaya kadar PENDING.
     @Enumerated(EnumType.STRING)

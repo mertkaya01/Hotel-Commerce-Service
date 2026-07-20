@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
@@ -21,6 +22,8 @@ public class HotelDetailResponse {
     private String countryName;
     private String cityName;
     private String rating;
+    // en ucuz oda fiyati (arama karti ile tutarli)
+    private BigDecimal minPrice;
     private String address;
     private String description;
     private String facilities;
