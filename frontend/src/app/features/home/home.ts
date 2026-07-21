@@ -16,7 +16,7 @@ import { HotelCard } from '../../shared/components/hotel-card/hotel-card';
 import { FeatureCard } from '../../shared/components/feature-card/feature-card';
 import { Faq } from '../../shared/components/faq/faq';
 import { GuestSelector } from '../../shared/components/guest-selector/guest-selector';
-import { normalizeSearchTerm } from '../../core/utils/search-terms';
+import { resolveSearchTerm } from '../../core/utils/search-terms';
 
 interface ActiveFilters {
   country?: string;
@@ -160,11 +160,19 @@ export class Home {
   }
 
   onSearch(): void {
-    // Türkçe ülke/şehir adını veri setindeki karşılığına çevir (almanya -> Germany)
-    this.query = normalizeSearchTerm(this.searchControl.value);
+    // Bilinen bir ülke/şehir adı yazıldıysa serbest metin yerine FİLTRE uygula:
+    // "almanya" -> country=Germany (yoksa açıklamada "Germany" geçen Hollanda
+    // otelleri de gelir). Aksi halde serbest metin araması yapılır.
+    const resolved = resolveSearchTerm(this.searchControl.value);
+    this.query = '';
+    const filters: ActiveFilters = {};
+    if (resolved.type === 'country') filters.country = resolved.value;
+    else if (resolved.type === 'city') filters.city = resolved.value;
+    else this.query = resolved.value;
+
     // seçilen tarih aralığını sakla -> otel detayındaki booking kutusuna taşınır
     this.searchDates.set(this.checkIn.value, this.checkOut.value);
-    this.activeFilters.set({});
+    this.activeFilters.set(filters);
     this.priceMin.set(null);
     this.priceMax.set(null);
     this.page.set(0);
