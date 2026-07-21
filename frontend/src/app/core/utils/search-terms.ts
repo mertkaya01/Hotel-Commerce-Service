@@ -1,31 +1,57 @@
 /**
  * Veri seti ülke/şehir adlarını İNGİLİZCE tutuyor (Germany, Netherlands...).
- * Kullanıcı Türkçe yazınca ("almanya", "hollanda") eşleşme olmuyor.
- * Bu sözlük, aramayı göndermeden önce Türkçe terimi veri setindeki karşılığına çevirir.
+ * Kullanıcı bir ülke/şehir adı yazdığında bunu SERBEST METİN olarak aramak yanlış
+ * sonuç verir: örn. "almanya" -> "Germany" serbest metni, açıklamasında "Germany"
+ * geçen Hollanda otellerini de getirir (Alman sınırına yakın vb.). Bu yüzden bilinen
+ * ülke/şehir adlarını FİLTRE (country/city) olarak uyguluyoruz — hem Türkçe hem
+ * İngilizce yazımı tanıyarak.
  */
-const TERM_MAP: Record<string, string> = {
-  // Ülkeler
+
+// Türkçe VE İngilizce yazim -> veri setindeki İngilizce ülke adi
+const COUNTRY_ALIASES: Record<string, string> = {
   almanya: 'Germany',
+  germany: 'Germany',
   hollanda: 'Netherlands',
+  netherlands: 'Netherlands',
   türkiye: 'Turkey',
   turkiye: 'Turkey',
+  turkey: 'Turkey',
   ispanya: 'Spain',
+  spain: 'Spain',
   italya: 'Italy',
+  italy: 'Italy',
   yunanistan: 'Greece',
+  greece: 'Greece',
   fransa: 'France',
+  france: 'France',
   ingiltere: 'United Kingdom',
   'birleşik krallık': 'United Kingdom',
   'birlesik krallik': 'United Kingdom',
-  // Şehir/bölge (veride farklı yazılanlar)
+  'united kingdom': 'United Kingdom',
+  uk: 'United Kingdom',
+};
+
+// Veride farklı yazılan / Türkçe şehir adları -> veri setindeki karşılığı
+const CITY_ALIASES: Record<string, string> = {
   kapadokya: 'Nevsehir',
   istanbul: 'Istanbul',
-  izmir: 'Izmir',
   'i̇stanbul': 'Istanbul',
+  izmir: 'Izmir',
   'i̇zmir': 'Izmir',
 };
 
-/** Arama terimini, biliniyorsa veri setindeki karşılığına çevirir; yoksa aynen döner. */
-export function normalizeSearchTerm(raw: string): string {
+export type ResolvedSearch = {
+  type: 'country' | 'city' | 'text';
+  value: string;
+};
+
+/**
+ * Arama terimini çözümler: bilinen bir ülke/şehir ise onu FİLTRE olarak
+ * (type country/city), değilse serbest metin (type text) olarak döner.
+ */
+export function resolveSearchTerm(raw: string): ResolvedSearch {
   const key = raw.trim().toLocaleLowerCase('tr');
-  return TERM_MAP[key] ?? raw.trim();
+  if (COUNTRY_ALIASES[key]) return { type: 'country', value: COUNTRY_ALIASES[key] };
+  if (CITY_ALIASES[key]) return { type: 'city', value: CITY_ALIASES[key] };
+  return { type: 'text', value: raw.trim() };
 }
