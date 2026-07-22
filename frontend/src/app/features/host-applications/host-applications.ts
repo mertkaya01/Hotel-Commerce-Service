@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -11,7 +12,7 @@ import { resolveFileUrl } from '../../core/utils/file-url';
 
 @Component({
   selector: 'app-host-applications',
-  imports: [DatePipe, MatIconModule, MatProgressSpinnerModule],
+  imports: [DatePipe, RouterLink, MatIconModule, MatProgressSpinnerModule],
   templateUrl: './host-applications.html',
   styleUrl: './host-applications.scss',
 })

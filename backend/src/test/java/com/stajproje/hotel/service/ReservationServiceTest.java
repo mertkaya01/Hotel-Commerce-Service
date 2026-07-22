@@ -42,6 +42,8 @@ class ReservationServiceTest {
     @Mock private RoomRepository roomRepository;
     @Mock private UserRepository userRepository;
 
+    @Mock private AuditService auditService;
+
     @InjectMocks private ReservationService reservationService;
 
     private Room room;

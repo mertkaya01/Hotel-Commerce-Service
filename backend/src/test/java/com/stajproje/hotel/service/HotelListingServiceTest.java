@@ -45,6 +45,8 @@ class HotelListingServiceTest {
     @Mock private UserRepository userRepository;
     @Mock private SolrHotelIndexer solrIndexer;
 
+    @Mock private AuditService auditService;
+
     @InjectMocks private HotelListingService listingService;
 
     private User owner;

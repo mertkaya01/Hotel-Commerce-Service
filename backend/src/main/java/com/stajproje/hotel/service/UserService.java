@@ -18,6 +18,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuditService auditService;
 
     public UserProfileResponse getProfile(Long userId) {
         User user = userRepository.findById(userId)
@@ -65,6 +66,8 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
+        auditService.log(com.stajproje.hotel.entity.AuditEventType.PASSWORD_CHANGED,
+                user.getEmail(), "Şifre değiştirildi");
     }
 
     private UserProfileResponse toResponse(User user) {

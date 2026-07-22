@@ -28,6 +28,7 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
+    private final AuditService auditService;
 
     @Transactional
     public ReservationResponse create(Long userId, CreateReservationRequest request) {
@@ -55,6 +56,9 @@ public class ReservationService {
                 .build();
 
         reservationRepository.save(reservation);
+        auditService.log(com.stajproje.hotel.entity.AuditEventType.RESERVATION_CREATED,
+                "Rezervasyon: " + room.getHotel().getName()
+                        + " (" + request.getCheckIn() + " → " + request.getCheckOut() + ")");
         return toResponse(reservation);
     }
 
@@ -75,6 +79,8 @@ public class ReservationService {
 
         reservation.setStatus(ReservationStatus.CANCELLED);
         reservationRepository.save(reservation);
+        auditService.log(com.stajproje.hotel.entity.AuditEventType.RESERVATION_CANCELLED,
+                "Rezervasyon iptal edildi: " + reservation.getRoom().getHotel().getName());
     }
 
     private ReservationResponse toResponse(Reservation reservation) {

@@ -31,6 +31,7 @@ public class EmailVerificationService {
     private final EmailVerificationTokenRepository tokenRepository;
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final AuditService auditService;
 
     // Doğrulama linki frontend'e gider; frontend token'ı backend'e doğrulatır.
     @Value("${app.frontend-url:http://localhost:4200}")
@@ -79,6 +80,8 @@ public class EmailVerificationService {
         record.setUsed(true);
         tokenRepository.save(record);
 
+        auditService.log(com.stajproje.hotel.entity.AuditEventType.EMAIL_VERIFIED,
+                user.getEmail(), "E-posta doğrulandı");
         log.info("E-posta dogrulandi: {}", user.getEmail());
         return user.getEmail();
     }

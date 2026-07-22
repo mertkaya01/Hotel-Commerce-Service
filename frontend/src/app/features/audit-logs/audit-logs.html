@@ -1,0 +1,84 @@
+<div class="logs-page container">
+  <div class="admin-tabs">
+    <a routerLink="/host/applications" class="tab">Başvurular</a>
+    <a routerLink="/admin/loglar" class="tab active">Log Kayıtları</a>
+  </div>
+
+  <h1 class="section-title">Log Kayıtları</h1>
+  <p class="section-subtitle">Sistemdeki tüm önemli olaylar — kim, ne zaman, ne yaptı.</p>
+
+  <!-- Filtreler -->
+  <div class="filters">
+    <label class="filter">
+      <span>Olay tipi</span>
+      <select [value]="typeFilter()" (change)="onTypeChange($any($event.target).value)">
+        <option value="">Tümü</option>
+        @for (t of types(); track t) {
+          <option [value]="t">{{ typeLabel(t) }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="filter">
+      <span>Kullanıcı (e-posta)</span>
+      <input
+        type="text"
+        placeholder="ör. mert@..."
+        [value]="actorFilter()"
+        (keyup.enter)="onActorInput($any($event.target).value)"
+        (change)="onActorInput($any($event.target).value)"
+      />
+    </label>
+
+    @if (hasFilter()) {
+      <button class="clear-btn" (click)="clearFilters()">
+        <mat-icon inline>close</mat-icon> Filtreyi temizle
+      </button>
+    }
+
+    <span class="total">{{ totalElements() }} kayıt</span>
+  </div>
+
+  @if (loading()) {
+    <div class="center"><mat-spinner diameter="40"></mat-spinner></div>
+  } @else if (logs().length === 0) {
+    <div class="empty">
+      <mat-icon>history</mat-icon>
+      <h3>Kayıt yok</h3>
+      <p>Bu filtreye uygun bir log bulunamadı.</p>
+    </div>
+  } @else {
+    <div class="table-wrap">
+      <table class="log-table">
+        <thead>
+          <tr>
+            <th>Zaman</th>
+            <th>Olay</th>
+            <th>Kullanıcı</th>
+            <th>Açıklama</th>
+            <th>IP</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (log of logs(); track log.id) {
+            <tr>
+              <td class="nowrap">{{ log.createdAt | date: 'dd.MM.yyyy HH:mm:ss' }}</td>
+              <td><span class="chip" [class]="chipClass(log.eventType)">{{ label(log.eventType) }}</span></td>
+              <td class="nowrap">{{ log.actorEmail ?? '—' }}</td>
+              <td>{{ log.description ?? '' }}</td>
+              <td class="nowrap muted">{{ log.ipAddress ?? '—' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPages() > 1) {
+      <div class="pagination">
+        <button class="btn-outline" [disabled]="page() === 0" (click)="goToPage(page() - 1)">Önceki</button>
+        <span>Sayfa {{ page() + 1 }} / {{ totalPages() }}</span>
+        <button class="btn-outline" [disabled]="page() + 1 >= totalPages()" (click)="goToPage(page() + 1)">Sonraki</button>
+      </div>
+    }
+  }
+</div>

@@ -3,6 +3,7 @@ package com.stajproje.hotel.service;
 import com.stajproje.hotel.dto.auth.AuthResponse;
 import com.stajproje.hotel.dto.auth.LoginRequest;
 import com.stajproje.hotel.dto.auth.RegisterRequest;
+import com.stajproje.hotel.entity.AuditEventType;
 import com.stajproje.hotel.entity.Role;
 import com.stajproje.hotel.entity.User;
 import com.stajproje.hotel.exception.EmailAlreadyExistsException;
@@ -24,6 +25,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final EmailVerificationService emailVerificationService;
+    private final AuditService auditService;
 
     public AuthResponse register(RegisterRequest request) {
         // E-postayi normalize et: "Test@X.com " ve "test@x.com" ayni hesap olmali.
@@ -49,6 +51,7 @@ public class AuthService {
         // Dogrulama maili gonder (best-effort/@Async: gonderim kaydı bozmaz).
         // Engellemeyen akis: kullanici hemen giris yapabilir, sadece "dogrulanmadi".
         emailVerificationService.createAndSend(user);
+        auditService.log(AuditEventType.USER_REGISTERED, email, "Yeni üye kaydı");
 
         String token = jwtService.generateToken(new UserPrincipal(user));
         return buildAuthResponse(user, token);
@@ -58,12 +61,19 @@ public class AuthService {
         // Girisde de normalize et ki kayittaki normalize edilmis e-postayla eslessin.
         String email = normalizeEmail(request.getEmail());
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, request.getPassword()));
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, request.getPassword()));
+        } catch (RuntimeException ex) {
+            // Basarisiz giris denemesini de kaydet (guvenlik/brute-force izi)
+            auditService.log(AuditEventType.USER_LOGIN_FAILED, email, "Başarısız giriş denemesi");
+            throw ex;
+        }
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow();
 
+        auditService.log(AuditEventType.USER_LOGIN_SUCCESS, email, "Giriş yapıldı");
         String token = jwtService.generateToken(new UserPrincipal(user));
         return buildAuthResponse(user, token);
     }
