@@ -32,6 +32,7 @@ class AuthServiceTest {
     @Mock private AuthenticationManager authenticationManager;
     @Mock private JwtService jwtService;
     @Mock private EmailVerificationService emailVerificationService;
+    @Mock private AuditService auditService;
 
     @InjectMocks private AuthService authService;
 

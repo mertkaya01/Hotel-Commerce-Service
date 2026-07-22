@@ -11,6 +11,7 @@ import { BecomeHost } from './features/become-host/become-host';
 import { HostApplications } from './features/host-applications/host-applications';
 import { AddHotel } from './features/add-hotel/add-hotel';
 import { VerifyEmail } from './features/verify-email/verify-email';
+import { AuditLogs } from './features/audit-logs/audit-logs';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
 import { superAdminGuard } from './core/guards/super-admin.guard';
@@ -26,6 +27,7 @@ export const routes: Routes = [
   { path: 'host/add-hotel', component: AddHotel, canActivate: [adminGuard] },
   { path: 'host/applications', component: HostApplications, canActivate: [superAdminGuard] },
   { path: 'host/hotel-listings', redirectTo: 'host/applications' },
+  { path: 'admin/loglar', component: AuditLogs, canActivate: [superAdminGuard] },
   { path: 'login', component: Login },
   { path: 'register', component: Register },
   { path: 'dogrula', component: VerifyEmail },

@@ -15,6 +15,7 @@ Gerçek bir otel veri seti (1M+ satır) üzerine kurulu, **tam yığın (full-st
 - **Onay sistemi** — otel yalnızca platform yöneticisi onayladıktan sonra aramaya girer
 - **Güvenli kayıt/giriş** — BCrypt + stateless JWT, e-posta normalizasyonu, şifre gücü kuralı, rol bazlı yetki
 - **E-posta doğrulama** — kayıtta doğrulama maili (Brevo), linke tıklayınca hesap doğrulanır (engellemeyen akış)
+- **Denetim kayıtları (audit log)** — kayıt/giriş/başarısız giriş/otel/rezervasyon vb. olaylar loglanır; yönetici panelinde filtre + sayfalama ile "kim, ne zaman, ne yaptı"
 - **Roller** — `USER` (misafir) · `ADMIN` (ev sahibi) · `SUPER_ADMIN` (platform yöneticisi)
 
 ---
@@ -161,6 +162,7 @@ Tam ve interaktif liste: **Swagger UI** (`/swagger-ui/index.html`).
 | POST | `/api/auth/login` | Giriş (JWT döner) | ✗ |
 | POST | `/api/auth/verify` | E-posta doğrula (token) | ✗ |
 | POST | `/api/users/me/resend-verification` | Doğrulama mailini tekrar gönder | ✓ |
+| GET | `/api/admin/audit-logs` | Denetim kayıtları (type/actor/page filtre) | ✓ SUPER_ADMIN |
 | GET | `/api/hotels/search` | Arama + facet (q, country, city, rating, **minPrice, maxPrice**, sort, page, size) | ✗ |
 | GET | `/api/hotels/{hotelCode}` | Otel detayı | ✗ |
 | GET | `/api/hotels/{hotelCode}/rooms` | Oda listesi | ✗ |
@@ -184,7 +186,7 @@ Tam ve interaktif liste: **Swagger UI** (`/swagger-ui/index.html`).
 ## 🧪 Test
 
 ```bash
-cd backend && ./mvnw test          # 41 test (JUnit 5 + Mockito + AssertJ)
+cd backend && ./mvnw test          # 43 test (JUnit 5 + Mockito + AssertJ)
 cd frontend && npx ng test --watch=false   # 26 test (Vitest)
 ```
 

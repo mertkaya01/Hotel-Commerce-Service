@@ -34,6 +34,7 @@ public class HotelListingService {
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
     private final SolrHotelIndexer solrIndexer;
+    private final AuditService auditService;
 
     /** Ev sahibi yeni otel ekler -> PENDING (aramada henüz YOK, Solr'a yazılmaz). */
     @Transactional
@@ -70,6 +71,8 @@ public class HotelListingService {
                     .build());
         }
 
+        auditService.log(com.stajproje.hotel.entity.AuditEventType.HOTEL_SUBMITTED,
+                "Otel eklendi (onay bekliyor): " + hotel.getName());
         return toResponse(hotel, request.getRooms().size());
     }
 
@@ -99,6 +102,8 @@ public class HotelListingService {
         solrIndexer.commit();
 
         log.info("Otel onaylandi ve indexlendi: {} ({})", hotel.getName(), hotel.getHotelCode());
+        auditService.log(com.stajproje.hotel.entity.AuditEventType.HOTEL_APPROVED,
+                "Otel onaylandı: " + hotel.getName());
         return toResponse(hotel, roomRepository.findByHotelId(hotel.getId()).size());
     }
 
@@ -108,6 +113,8 @@ public class HotelListingService {
         Hotel hotel = getPendingOrThrow(hotelId);
         hotel.setStatus(HotelStatus.REJECTED);
         hotelRepository.save(hotel);
+        auditService.log(com.stajproje.hotel.entity.AuditEventType.HOTEL_REJECTED,
+                "Otel reddedildi: " + hotel.getName());
         return toResponse(hotel, roomRepository.findByHotelId(hotel.getId()).size());
     }
 

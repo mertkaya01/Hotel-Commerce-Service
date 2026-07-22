@@ -23,6 +23,7 @@ public class HostApplicationService {
 
     private final HostApplicationRepository applicationRepository;
     private final UserRepository userRepository;
+    private final AuditService auditService;
 
     /** Kullanıcı ev sahibi başvurusu yapar -> PENDING. */
     @Transactional
@@ -51,6 +52,8 @@ public class HostApplicationService {
         application.setReviewedAt(null);
 
         applicationRepository.save(application);
+        auditService.log(com.stajproje.hotel.entity.AuditEventType.HOST_APPLICATION_SUBMITTED,
+                user.getEmail(), "Ev sahibi başvurusu yapıldı");
         return toResponse(application);
     }
 
@@ -81,6 +84,8 @@ public class HostApplicationService {
         userRepository.save(applicant);
         applicationRepository.save(application);
 
+        auditService.log(com.stajproje.hotel.entity.AuditEventType.HOST_APPLICATION_APPROVED,
+                "Ev sahibi başvurusu onaylandı: " + applicant.getEmail());
         return toResponse(application);
     }
 
@@ -91,6 +96,8 @@ public class HostApplicationService {
         application.setStatus(HostApplicationStatus.REJECTED);
         application.setReviewedAt(LocalDateTime.now());
         applicationRepository.save(application);
+        auditService.log(com.stajproje.hotel.entity.AuditEventType.HOST_APPLICATION_REJECTED,
+                "Ev sahibi başvurusu reddedildi: " + application.getUser().getEmail());
         return toResponse(application);
     }
 
