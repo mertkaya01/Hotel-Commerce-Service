@@ -50,6 +50,9 @@ export class Profile {
   readonly changingPw = signal(false);
   readonly email = signal('');
   readonly application = signal<HostApplication | null>(null);
+  // e-posta doğrulama durumu (yüklenene kadar true -> uyarı yanıp sönmesin)
+  readonly emailVerified = signal(true);
+  readonly resending = signal(false);
 
   readonly initials = computed(() => {
     const u = this.user();
@@ -71,6 +74,8 @@ export class Profile {
     this.userService.getProfile().subscribe({
       next: (profile) => {
         this.email.set(profile.email);
+        this.emailVerified.set(profile.emailVerified);
+        if (profile.emailVerified) this.authService.markVerifiedInSession();
         this.form.patchValue({ firstName: profile.firstName, lastName: profile.lastName });
         this.authService.updateCurrentUserRole(profile.role);
         this.loading.set(false);
@@ -91,6 +96,22 @@ export class Profile {
 
   toggleThemes(): void {
     this.showThemes.update((v) => !v);
+  }
+
+  resendVerification(): void {
+    this.resending.set(true);
+    this.authService.resendVerification().subscribe({
+      next: () => {
+        this.resending.set(false);
+        this.snackBar.open('Doğrulama e-postası gönderildi, gelen kutunu kontrol et', 'Tamam', {
+          duration: 4000,
+        });
+      },
+      error: () => {
+        this.resending.set(false);
+        this.snackBar.open('E-posta gönderilemedi, tekrar dene', 'Tamam', { duration: 3500 });
+      },
+    });
   }
 
   onSave(): void {

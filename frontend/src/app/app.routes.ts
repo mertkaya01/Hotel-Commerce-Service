@@ -10,6 +10,7 @@ import { Host } from './features/host/host';
 import { BecomeHost } from './features/become-host/become-host';
 import { HostApplications } from './features/host-applications/host-applications';
 import { AddHotel } from './features/add-hotel/add-hotel';
+import { VerifyEmail } from './features/verify-email/verify-email';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
 import { superAdminGuard } from './core/guards/super-admin.guard';
@@ -27,5 +28,6 @@ export const routes: Routes = [
   { path: 'host/hotel-listings', redirectTo: 'host/applications' },
   { path: 'login', component: Login },
   { path: 'register', component: Register },
+  { path: 'dogrula', component: VerifyEmail },
   { path: '**', redirectTo: '' },
 ];

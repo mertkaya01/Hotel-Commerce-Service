@@ -14,6 +14,7 @@ Gerçek bir otel veri seti (1M+ satır) üzerine kurulu, **tam yığın (full-st
 - **Ev sahipliği** — başvur, onaylanınca otelini ekle (fotoğraf yükleme + olanaklar + odalar)
 - **Onay sistemi** — otel yalnızca platform yöneticisi onayladıktan sonra aramaya girer
 - **Güvenli kayıt/giriş** — BCrypt + stateless JWT, e-posta normalizasyonu, şifre gücü kuralı, rol bazlı yetki
+- **E-posta doğrulama** — kayıtta doğrulama maili (Brevo), linke tıklayınca hesap doğrulanır (engellemeyen akış)
 - **Roller** — `USER` (misafir) · `ADMIN` (ev sahibi) · `SUPER_ADMIN` (platform yöneticisi)
 
 ---
@@ -156,8 +157,10 @@ Tam ve interaktif liste: **Swagger UI** (`/swagger-ui/index.html`).
 
 | Metot | Yol | Açıklama | Auth |
 |---|---|---|---|
-| POST | `/api/auth/register` | Kayıt | ✗ |
+| POST | `/api/auth/register` | Kayıt (doğrulama maili gönderir) | ✗ |
 | POST | `/api/auth/login` | Giriş (JWT döner) | ✗ |
+| POST | `/api/auth/verify` | E-posta doğrula (token) | ✗ |
+| POST | `/api/users/me/resend-verification` | Doğrulama mailini tekrar gönder | ✓ |
 | GET | `/api/hotels/search` | Arama + facet (q, country, city, rating, **minPrice, maxPrice**, sort, page, size) | ✗ |
 | GET | `/api/hotels/{hotelCode}` | Otel detayı | ✗ |
 | GET | `/api/hotels/{hotelCode}/rooms` | Oda listesi | ✗ |
@@ -181,8 +184,8 @@ Tam ve interaktif liste: **Swagger UI** (`/swagger-ui/index.html`).
 ## 🧪 Test
 
 ```bash
-cd backend && ./mvnw test          # 35 test (JUnit 5 + Mockito + AssertJ)
-cd frontend && npx ng test --watch=false   # 22 test (Vitest)
+cd backend && ./mvnw test          # 41 test (JUnit 5 + Mockito + AssertJ)
+cd frontend && npx ng test --watch=false   # 26 test (Vitest)
 ```
 
 Testler dış altyapıya (Solr) bağımlı **değildir** — `test` profilinde in-memory H2 kullanılır, arama/import bileşenleri `@Profile("!test")` ile devre dışı bırakılır. Bu sayede CI'da Solr servisi çalıştırmaya gerek kalmaz.

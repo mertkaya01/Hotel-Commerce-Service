@@ -65,6 +65,27 @@
       <div class="left-col">
         <section class="panel">
           <h2>Hesap Bilgileri</h2>
+
+          @if (!loading()) {
+            @if (emailVerified()) {
+              <div class="verify-banner ok">
+                <mat-icon>verified</mat-icon>
+                <span>E-posta adresin doğrulandı</span>
+              </div>
+            } @else {
+              <div class="verify-banner warn">
+                <mat-icon>mark_email_unread</mat-icon>
+                <div class="vb-text">
+                  <strong>E-postan doğrulanmadı</strong>
+                  <span>Gelen kutundaki doğrulama bağlantısına tıkla.</span>
+                </div>
+                <button type="button" class="vb-btn" (click)="resendVerification()" [disabled]="resending()">
+                  @if (resending()) { Gönderiliyor… } @else { Tekrar gönder }
+                </button>
+              </div>
+            }
+          }
+
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Email</mat-label>
             <input matInput [value]="email()" disabled />

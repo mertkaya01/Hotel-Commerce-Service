@@ -31,6 +31,7 @@ class AuthServiceTest {
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private AuthenticationManager authenticationManager;
     @Mock private JwtService jwtService;
+    @Mock private EmailVerificationService emailVerificationService;
 
     @InjectMocks private AuthService authService;
 
@@ -95,5 +96,24 @@ class AuthServiceTest {
         assertThat(saved.getRole()).isEqualTo(Role.USER);
         assertThat(response.getToken()).isEqualTo("jwt-token");
         assertThat(response.getEmail()).isEqualTo("mert@example.com");
+    }
+
+    @Test
+    void register_shouldCreateUnverifiedUser_andTriggerVerificationEmail() {
+        when(userRepository.existsByEmail(any())).thenReturn(false);
+        when(passwordEncoder.encode(any())).thenReturn("HASHED_PW");
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(jwtService.generateToken(any(UserDetails.class))).thenReturn("jwt-token");
+
+        AuthResponse response = authService.register(registerRequest());
+
+        // yeni kullanici DOGRULANMAMIS olmali
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(captor.capture());
+        assertThat(captor.getValue().isEmailVerified()).isFalse();
+        assertThat(response.isEmailVerified()).isFalse();
+
+        // dogrulama maili tetiklenmeli
+        verify(emailVerificationService).createAndSend(any(User.class));
     }
 }

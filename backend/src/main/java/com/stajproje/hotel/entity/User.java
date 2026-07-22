@@ -48,6 +48,12 @@ public class User {
     @Column(nullable = false, columnDefinition = "varchar(20)")
     private Role role;
 
+    // E-posta doğrulaması yapıldı mı? Kayıtta false; doğrulama linkine tıklayınca true.
+    // (Engellemeyen akış: doğrulanmasa da giriş yapılabilir, sadece rozet gösterilir.)
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean emailVerified = false;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

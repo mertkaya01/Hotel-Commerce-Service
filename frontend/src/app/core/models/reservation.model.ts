@@ -23,6 +23,7 @@ export interface UserProfile {
   firstName: string;
   lastName: string;
   role: string;
+  emailVerified: boolean;
 }
 
 export interface UpdateProfileRequest {

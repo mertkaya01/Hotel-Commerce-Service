@@ -16,6 +16,7 @@ export interface AuthResponse {
   firstName: string;
   lastName: string;
   role: string;
+  emailVerified: boolean;
 }
 
 export interface AuthUser {
@@ -23,4 +24,5 @@ export interface AuthUser {
   firstName: string;
   lastName: string;
   role: string;
+  emailVerified: boolean;
 }

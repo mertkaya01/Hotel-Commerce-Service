@@ -1,0 +1,23 @@
+<div class="verify-page container">
+  <div class="verify-card">
+    @switch (state()) {
+      @case ('loading') {
+        <mat-spinner diameter="48"></mat-spinner>
+        <h1>Doğrulanıyor…</h1>
+        <p>E-posta adresin doğrulanıyor, lütfen bekle.</p>
+      }
+      @case ('success') {
+        <div class="icon ok"><mat-icon>check_circle</mat-icon></div>
+        <h1>E-postan doğrulandı 🎉</h1>
+        <p>{{ message() }}</p>
+        <a routerLink="/" class="btn-primary">Ana sayfaya dön</a>
+      }
+      @case ('error') {
+        <div class="icon err"><mat-icon>error</mat-icon></div>
+        <h1>Doğrulama başarısız</h1>
+        <p>{{ message() }}</p>
+        <a routerLink="/profile" class="btn-outline">Profilime git</a>
+      }
+    }
+  </div>
+</div>

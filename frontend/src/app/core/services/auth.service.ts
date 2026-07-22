@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, computed, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -35,6 +35,31 @@ export class AuthService {
     this.currentUserSignal.set(null);
   }
 
+  /** Maildeki linkten gelen token'ı doğrular (herkese açık). */
+  verifyEmail(token: string): Observable<{ message: string }> {
+    const params = new HttpParams().set('token', token);
+    return this.http.post<{ message: string }>(`${this.apiUrl}/verify`, null, { params }).pipe(
+      tap(() => this.markVerifiedInSession()),
+    );
+  }
+
+  /** Doğrulama mailini yeniden gönder (giriş yapmış kullanıcı). */
+  resendVerification(): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      `${environment.apiUrl}/users/me/resend-verification`,
+      null,
+    );
+  }
+
+  /** Oturumdaki kullanıcıyı "doğrulandı" olarak işaretle (rozet tazelensin). */
+  markVerifiedInSession(): void {
+    const current = this.currentUserSignal();
+    if (!current || current.emailVerified) return;
+    const updated: AuthUser = { ...current, emailVerified: true };
+    localStorage.setItem(USER_KEY, JSON.stringify(updated));
+    this.currentUserSignal.set(updated);
+  }
+
   getToken(): string | null {
     return localStorage.getItem(TOKEN_KEY);
   }
@@ -68,6 +93,7 @@ export class AuthService {
       firstName: response.firstName,
       lastName: response.lastName,
       role: response.role,
+      emailVerified: response.emailVerified,
     };
     localStorage.setItem(TOKEN_KEY, response.token);
     localStorage.setItem(USER_KEY, JSON.stringify(user));

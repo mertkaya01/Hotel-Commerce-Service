@@ -18,4 +18,5 @@ public class UserProfileResponse {
     private String firstName;
     private String lastName;
     private String role;
+    private boolean emailVerified;
 }

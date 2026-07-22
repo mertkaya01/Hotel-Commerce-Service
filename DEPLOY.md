@@ -22,7 +22,16 @@ böylece tarayıcı her şeyi aynı origin'den görür ve CORS derdi olmaz.
 5. `hotel-backend` servisine gir → **Environment**:
    - `SOLR_BASE_URL` = `https://hotel-solr-ab12.onrender.com/solr` (kendi Solr adresin + `/solr`)
    - `APP_CORS_ORIGINS` = (Vercel adresini Bölüm 2'de alınca gireceksin; şimdilik boş/placeholder)
+   - `APP_FRONTEND_URL` = Vercel adresin (doğrulama maili linkinin işaret edeceği yer, örn. `https://senin-projen.vercel.app`)
+   - `BREVO_API_KEY` = Brevo API anahtarın (aşağıda) — **boş bırakırsan mail gönderilmez, link sadece log'a düşer**
+   - `BREVO_SENDER` = Brevo'da **doğrulanmış** gönderen e-postan
    - **Save** → backend yeniden deploy olur. İlk açılışta ~5000 oteli H2 + Solr'a yükler (30-60 sn).
+
+   **Brevo kurulumu (e-posta doğrulama için):**
+   1. https://www.brevo.com → ücretsiz kayıt (günde 300 mail bedava)
+   2. **Senders & IP → Senders** → kendi e-postanı ekle ve gelen doğrulama mailiyle onayla → bu adres `BREVO_SENDER` olur
+   3. **SMTP & API → API Keys** → yeni bir key oluştur → `BREVO_API_KEY` olur
+   4. Bu ikisini Render'da yukarıdaki env'lere gir. (Anahtar yoksa uygulama çalışır ama mail gitmez.)
 6. Backend adresini not al (ör. `https://hotel-backend-cd34.onrender.com`).
    - Test: tarayıcıda `https://hotel-backend-cd34.onrender.com/api/hotels/search?size=1` → JSON dönmeli.
 
