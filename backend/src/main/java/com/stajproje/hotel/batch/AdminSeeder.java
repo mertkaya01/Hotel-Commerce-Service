@@ -39,14 +39,16 @@ public class AdminSeeder implements CommandLineRunner {
                     .firstName("Platform")
                     .lastName("Yönetici")
                     .role(Role.SUPER_ADMIN)
+                    .emailVerified(true) // seed hesabi dogrulanmis sayilir
                     .build();
             userRepository.save(admin);
             log.info("Varsayilan platform yoneticisi olusturuldu: {} / admin1234", ADMIN_EMAIL);
-        } else if (admin.getRole() != Role.SUPER_ADMIN) {
-            // mevcut hesabın rolünü SUPER_ADMIN'e sabitle (eski kurulumlardan kalmış olabilir)
+        } else if (admin.getRole() != Role.SUPER_ADMIN || !admin.isEmailVerified()) {
+            // mevcut hesabın rolünü/dogrulama durumunu sabitle (eski kurulumlardan kalmış olabilir)
             admin.setRole(Role.SUPER_ADMIN);
+            admin.setEmailVerified(true);
             userRepository.save(admin);
-            log.info("{} rolu SUPER_ADMIN olarak guncellendi", ADMIN_EMAIL);
+            log.info("{} SUPER_ADMIN + dogrulanmis olarak guncellendi", ADMIN_EMAIL);
         }
     }
 }

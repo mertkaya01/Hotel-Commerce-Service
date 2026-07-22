@@ -23,6 +23,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final EmailVerificationService emailVerificationService;
 
     public AuthResponse register(RegisterRequest request) {
         // E-postayi normalize et: "Test@X.com " ve "test@x.com" ayni hesap olmali.
@@ -40,9 +41,14 @@ public class AuthService {
                 .firstName(request.getFirstName().trim())
                 .lastName(request.getLastName().trim())
                 .role(Role.USER)
+                .emailVerified(false)
                 .build();
 
         userRepository.save(user);
+
+        // Dogrulama maili gonder (best-effort/@Async: gonderim kaydı bozmaz).
+        // Engellemeyen akis: kullanici hemen giris yapabilir, sadece "dogrulanmadi".
+        emailVerificationService.createAndSend(user);
 
         String token = jwtService.generateToken(new UserPrincipal(user));
         return buildAuthResponse(user, token);
@@ -73,6 +79,7 @@ public class AuthService {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .role(user.getRole())
+                .emailVerified(user.isEmailVerified())
                 .build();
     }
 }

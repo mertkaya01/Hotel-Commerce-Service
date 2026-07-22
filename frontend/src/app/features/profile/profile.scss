@@ -327,3 +327,54 @@
 .btn-outline {
   margin-top: 8px;
 }
+
+/* E-posta doğrulama bandı */
+.verify-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+
+  mat-icon { flex-shrink: 0; }
+
+  &.ok {
+    background: rgb(46 160 67 / 0.1);
+    color: var(--success);
+  }
+
+  &.warn {
+    background: #fff8e1;
+    color: #7a5b00;
+
+    mat-icon { color: #b8860b; }
+  }
+
+  .vb-text {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    line-height: 1.35;
+
+    span { color: inherit; opacity: 0.85; font-size: 0.82rem; }
+  }
+
+  .vb-btn {
+    flex-shrink: 0;
+    padding: 7px 12px;
+    border: 1px solid currentColor;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover:not(:disabled) { background: rgb(0 0 0 / 0.05); }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+  }
+}

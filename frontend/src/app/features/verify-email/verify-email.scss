@@ -1,0 +1,43 @@
+.verify-page {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-block: 48px;
+}
+
+.verify-card {
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 40px 28px;
+
+  h1 {
+    margin: 18px 0 8px;
+    font-size: 1.5rem;
+  }
+
+  p {
+    color: var(--text-muted);
+    margin: 0 0 22px;
+    line-height: 1.5;
+  }
+
+  .icon mat-icon {
+    font-size: 56px;
+    width: 56px;
+    height: 56px;
+  }
+
+  .icon.ok mat-icon { color: var(--success); }
+  .icon.err mat-icon { color: var(--danger); }
+
+  .btn-primary,
+  .btn-outline {
+    display: inline-block;
+    padding: 12px 26px;
+  }
+}
